@@ -15,7 +15,7 @@ COMMENTS/Issues:
 
 Firefox binary (firefox_binary.cpython-37.pyc - possible original path 'miniconda3/lib/python3.7/site-packages/selenium/webdriver/firefox/__pycache__/firefox_binary.cpython-37.pyc') must be placed in the bin of your environment.
 
-A yaml file is required as input for the script and there are examples of input files for all three builders
+A yaml file is required as input for the script and there are examples of input files for all three builders (you'll have to add your own email and password for Charmm-Gui)
 
 Command to run:
 ```
