@@ -6,7 +6,7 @@ input1:
 input2:
   boxtype:
     option: null
-  email: ## 
+  email: ## ADD YOUR USER EMAIL TO CHARMM-GUI ##
   engine: gmx
   ff: c36m
   glycolipids:
@@ -43,7 +43,7 @@ input2:
     - CTER
     - 1
     - 1
-  password: 6KNzBsY37wQc
+  password: ## ADD YOUR USER PASSWORD TO CHARMM-GUI ##
   pegs:
   - - DAG
     - DLGL
