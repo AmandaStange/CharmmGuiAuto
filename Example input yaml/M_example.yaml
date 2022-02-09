@@ -6,7 +6,7 @@ input1:
 input2:
   boxtype:
     option: null
-  email: 201605043@post.au.dk
+  email: ## 
   engine: gmx
   ff: c36m
   glycolipids:
