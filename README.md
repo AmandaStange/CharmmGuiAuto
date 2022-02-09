@@ -13,7 +13,7 @@ COMMENTS/Issues:
 - Can not be used on retrieved jobs (only if you modify it yourself which you are welcome to do)
 - For protein only uploads work not PDB ID.
 
-Firefox binary (firefox_binary.cpython-37.pyc - possible original path '/lib/python3.7/site-packages/selenium/webdriver/firefox/__pycache__/firefox_binary.cpython-37.pyc') must be placed in the bin of your environment.
+Firefox binary (firefox_binary.cpython-37.pyc - possible original path 'miniconda3/lib/python3.7/site-packages/selenium/webdriver/firefox/__pycache__/firefox_binary.cpython-37.pyc') must be placed in the bin of your environment.
 
 A yaml file is required as input for the script and there are examples of input files for all three builders
 
