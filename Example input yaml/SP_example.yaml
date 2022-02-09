@@ -1,0 +1,23 @@
+input0:
+  system_type: SP
+input1:
+  head: true
+  system: solution
+input2:
+  chains:
+  - - PROB
+    - first
+    - ACE
+  - - PROB
+    - last
+    - CT3
+  email: 201605043@post.au.dk
+  engine: gmx
+  ff: c36m
+  file_name: ins_trans.pdb
+  ions: NaCl
+  password: 6KNzBsY37wQc
+  path: /home/au555720/IR/TM/AA/CharmmGui
+  temp: 310
+  waterbox:
+    dis: 15.0
