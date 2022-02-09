@@ -21,14 +21,18 @@ import yaml
 
 class CharmmGuiAuto:
     def __init__(self, head, system):
-        self.path_out = '/Users/amandadyrholmstange/Documents/Documents - Amanda Dyrholm Stanges MacBook Pro/Uni/PhD/IR/TEMP/AA/IR_2/t10/t10_loop/output'
+        '''
+        head = True or False, for True the browser window is not visible for the user
+        system = membrane or solution
+        '''
+        #self.path_out = 
         options = webdriver.FirefoxOptions();
-        options.set_preference("browser.download.folderList", 2)
-        options.set_preference("browser.download.manager.showWhenStarting", False)
-        options.set_preference("browser.download.dir", self.path_out)
-        options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
-        options.set_preference("browser.download.improvements_to_download_panel", True);
-        options.set_preference("browser.download.manager.closeWhenDone", True)
+        #options.set_preference("browser.download.folderList", 2)
+        #options.set_preference("browser.download.manager.showWhenStarting", False)
+        #options.set_preference("browser.download.dir", self.path_out)
+        #options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
+        #options.set_preference("browser.download.improvements_to_download_panel", True);
+        #options.set_preference("browser.download.manager.closeWhenDone", True)
         options.headless = head
         self.driver = webdriver.Firefox(options=options)
         if system == 'membrane':
@@ -45,9 +49,11 @@ class CharmmGuiAuto:
         self.driver.find_element(By.CLASS_NAME, 'loginbox').submit()
         
     def upload(self, file_name, path):
+        '''
+        file_name = the name of your pdb file with the .pdb extension
+        path = the path to your file 
+        '''
         choose_file = self.driver.find_element(By.NAME, 'file')
-        # file_name = 'ins.pdb'
-        # path = '/Users/amandadyrholmstange/Documents/Documents - Amanda Dyrholm Stanges MacBook Pro/Uni/PhD/IR/TEMP/AA/IR_2/t10/t10_loop'
         file_location = os.path.join(path, file_name)
         choose_file.send_keys(file_location)
         self.driver.find_element(By.ID, 'nav_title').click()
@@ -66,7 +72,6 @@ class CharmmGuiAuto:
                 print('Found it!')
             except:
                 try:
-                    #if len(self.driver.find_elements(By.XPATH, '//*[@id="error_msg" and //*[contains(text(), "CHARMM was terminated abnormally")]]')) != 0:
                     WebDriverWait(self.driver, 1).until(EC.text_to_be_present_in_element((By.ID, "error_msg"), "CHARMM was terminated abnormally"))
                     print('ERROR MESSAGE - check "screenshot_error.png"')
                     self.driver.save_screenshot("screenshot_error.png")
