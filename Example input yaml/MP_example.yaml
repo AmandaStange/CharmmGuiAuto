@@ -15,7 +15,7 @@ input2:
   - - PROB
     - last
     - CT3
-  email: 201605043@post.au.dk
+  email: ## ADD YOUR USER EMAIL TO CHARMM-GUI ##
   engine: gmx
   ff: c36m
   file_name: ins_trans.pdb
@@ -55,8 +55,8 @@ input2:
     - 1
   orientation:
     option: PDB
-  password: 6KNzBsY37wQc
-  path: /home/au555720/IR/TM/AA/CharmmGui
+  password: ## ADD YOUR USER PASSWORD TO CHARMM-GUI ##
+  path: ## PATH TO THE INPUT FILE ##
   pegs:
   - - DAG
     - DLGL
