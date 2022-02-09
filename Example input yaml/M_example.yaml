@@ -1,0 +1,54 @@
+input0:
+  system_type: M
+input1:
+  head: false
+  system: membrane
+input2:
+  boxtype:
+    option: null
+  email: 201605043@post.au.dk
+  engine: gmx
+  ff: c36m
+  glycolipids:
+  - GRS: '1 CER160
+
+      2 - 1B: BGLC
+
+      3 - - 14B: BGAL
+
+      4 - - - 13B: BGLCNA
+
+      5 - - - - 13B: BGAL
+
+      6 - - - - - 13A: AGAL
+
+      7 - - - - - 12A: AFUC
+
+      '
+    lower: 1
+    upper: 1
+  ions: NaCl
+  lengthZ:
+    option: null
+  lipids:
+  - - chl1
+    - 1
+    - 1
+  - - popc
+    - 10
+    - 10
+  naas:
+  - - LAU
+    - GLY
+    - CTER
+    - 1
+    - 1
+  password: 6KNzBsY37wQc
+  pegs:
+  - - DAG
+    - DLGL
+    - 5
+    - 1
+    - 1
+  size: 100
+  temp: 310
