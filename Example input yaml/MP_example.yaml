@@ -3,7 +3,7 @@ input0:
 input1:
   headless: false
   system: membrane
-  path_out: /home/au555720/IR/TM/AA/CharmmGui
+  path_out: ## INSERT YOUR OUTPUT PATH HERE ##
 input2:
   area:
     option: null
@@ -41,7 +41,7 @@ input2:
   - - PROB
     - last
     - CT3
-  email: 201605043@post.au.dk
+  email: ## INSERT YOUR EMAIL FOR CHARMM-GUI HERE ##
   engine: gmx
   ff: c36m
   file_name: ins_trans.pdb
@@ -90,8 +90,8 @@ input2:
     upper: 1
   orientation:
     option: PDB
-  password: 6KNzBsY37wQc
-  path: /home/au555720/IR/TM/AA/CharmmGui
+  password: ## INSERT YOUR PASSWORD FOR CHARMM-GUI HERE ##
+  path: ## INSERT THE PATH TO INS_TRANS.PDB HERE ##
   pegs:
   -
     lipid: DAG
