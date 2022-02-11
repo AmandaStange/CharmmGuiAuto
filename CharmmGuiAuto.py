@@ -352,8 +352,8 @@ class CharmmGuiAuto:
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
-        os.system(f'mkdir output2')
-        os.system(f'tar -xvf {out_tmp}/charmm-gui.tgz -C output2/')
+        os.system(f'mkdir output')
+        os.system(f'tar -xvf {out_tmp}/charmm-gui.tgz -C output/')
         os.system(f'rm -r {out_tmp}')
         print('Unpacked')
 
@@ -695,6 +695,7 @@ class MembraneProtein(CharmmGuiAuto):
         self.temperature(temp)
         self.nxt()
         self.wait_text("to continue equilibration and production simulations")
+        self.downlad(jobid)
         print(f'Ready to download from retrive job id {jobid}')
 
 
@@ -746,6 +747,7 @@ class Membrane(MembraneProtein):
         self.nxt()
         self.wait_text("Equilibration Input Notes")
         print(f'Ready to download from retrive job id {jobid}')
+        self.downlad(jobid)
         self.driver.quit()
 
 
