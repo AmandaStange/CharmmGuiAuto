@@ -1,12 +1,13 @@
 input0:
   system_type: M
 input1:
-  head: false
+  headless: false
   system: membrane
+  path_out: /home/au555720/IR/TM/AA/CharmmGui
 input2:
   boxtype:
     option: null
-  email: ## ADD YOUR USER EMAIL TO CHARMM-GUI ##
+  email: 201605043@post.au.dk
   engine: gmx
   ff: c36m
   glycolipids:
@@ -43,7 +44,7 @@ input2:
     - CTER
     - 1
     - 1
-  password: ## ADD YOUR USER PASSWORD TO CHARMM-GUI ##
+  password: 6KNzBsY37wQc
   pegs:
   - - DAG
     - DLGL
