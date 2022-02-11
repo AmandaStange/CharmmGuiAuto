@@ -6,7 +6,7 @@ input1:
   path_out: ## INSERT OUTPUT PATH ##
 input2:
   preserve: 
-    option: null
+    option: yes
   mutations:
     - 
       chain: PROA
