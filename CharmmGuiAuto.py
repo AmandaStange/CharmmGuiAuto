@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+# In[46]:
 
 
 import selenium
@@ -10,30 +11,37 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import argparse
 import time
 import os
 import sys
 import yaml
 
 
+# In[47]:
+
+
+os.getcwd()
+
+
+# In[99]:
 
 
 class CharmmGuiAuto:
-    def __init__(self, head, system):
+    def __init__(self, headless, system, path_out):
         '''
         head = True or False, for True the browser window is not visible for the user
         system = membrane or solution
         '''
-        #self.path_out = 
+        global out_tmp
+        out_tmp = f'{path_out}/TMP'
         options = webdriver.FirefoxOptions();
-        #options.set_preference("browser.download.folderList", 2)
-        #options.set_preference("browser.download.manager.showWhenStarting", False)
-        #options.set_preference("browser.download.dir", self.path_out)
-        #options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
-        #options.set_preference("browser.download.improvements_to_download_panel", True);
-        #options.set_preference("browser.download.manager.closeWhenDone", True)
-        options.headless = head
+        options.set_preference("browser.download.folderList", 2)
+        options.set_preference("browser.download.manager.showWhenStarting", False)
+        options.set_preference("browser.download.dir", out_tmp)
+        options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
+        options.set_preference("browser.download.improvements_to_download_panel", True);
+        options.set_preference("browser.download.manager.closeWhenDone", True)
+        options.headless = headless
         self.driver = webdriver.Firefox(options=options)
         if system == 'membrane':
             self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
@@ -49,10 +57,6 @@ class CharmmGuiAuto:
         self.driver.find_element(By.CLASS_NAME, 'loginbox').submit()
         
     def upload(self, file_name, path):
-        '''
-        file_name = the name of your pdb file with the .pdb extension
-        path = the path to your file 
-        '''
         choose_file = self.driver.find_element(By.NAME, 'file')
         file_location = os.path.join(path, file_name)
         choose_file.send_keys(file_location)
@@ -72,6 +76,7 @@ class CharmmGuiAuto:
                 print('Found it!')
             except:
                 try:
+
                     WebDriverWait(self.driver, 1).until(EC.text_to_be_present_in_element((By.ID, "error_msg"), "CHARMM was terminated abnormally"))
                     print('ERROR MESSAGE - check "screenshot_error.png"')
                     self.driver.save_screenshot("screenshot_error.png")
@@ -82,10 +87,200 @@ class CharmmGuiAuto:
             print('window has been closed')
             self.driver.quit()
 
+    def preserve(self, option=None):
+        if option is None:
+            pass
+        else:
+            self.driver.find_element(By.ID, 'hbuild_checked').click()
             
+    def add_mutation(self, chain, rid, aa):
+        if chain == None:
+            pass
+        else:
+            if not self.driver.find_element(By.ID, 'id_mutation').is_displayed():
+                self.driver.find_element(By.ID, 'mutation_checked').click()
+                self.driver.find_element(By.XPATH, '//*[@id="id_mutation_table"]/tr[2]/td[5]/input').click()
+            self.driver.find_element(By.XPATH, '//input[@value="Add Mutation"]').click()
+            resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"mutation_chain_")]') if i.is_displayed()]
+            resid = resids[-1][-1]
+            Select(self.driver.find_element(By.ID, f'mutation_chain_{resid}')).select_by_value(chain)
+            Select(self.driver.find_element(By.ID, f'mutation_rid_{resid}')).select_by_value(rid)
+            Select(self.driver.find_element(By.ID, f'mutation_patch_{resid}')).select_by_value(aa)
+
+    def add_protonation(self, chain, res_i, rid, res_p):
+        if chain is None:
+            return
+        else:
+            if not self.driver.find_element(By.ID, 'id_prot').is_displayed():
+                self.driver.find_element(By.ID, 'prot_checked').click()
+                self.driver.find_element(By.XPATH, '//*[@id="id_prot_table"]/tr[2]/td[5]/input').click()
+            self.driver.find_element(By.XPATH, '//input[@value="Add Protonation"]').click()
+            resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"prot_chain_")]') if i.is_displayed()]
+            resid = resids[-1][-1]
+            Select(self.driver.find_element(By.ID, f'prot_chain_{resid}')).select_by_value(chain)
+            Select(self.driver.find_element(By.ID, f'prot_res_{resid}')).select_by_value(res_i)
+            Select(self.driver.find_element(By.ID, f'prot_rid_{resid}')).select_by_value(rid)
+            Select(self.driver.find_element(By.ID, f'prot_patch_{resid}')).select_by_value(res_p)
+
         
-    def patch(self, chain, ter, ter_patch):
-        Select(self.driver.find_element(By.NAME, f'terminal[{chain}][{ter}]')).select_by_value(f'{ter_patch}')
+    def add_disulfide(self, chain1, rid1, chain2, rid2):
+        if chain1 is None:
+            pass
+        else:
+            if not self.driver.find_element(By.ID, 'id_dif').is_displayed():
+                self.driver.find_element(By.ID, 'ssbonds_checked').click()
+                while len([i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"ssbond_chain1")]') if i.is_displayed()]) != 0:
+                    self.driver.find_element(By.XPATH, '//*[@id="id_dif_table"]/tr[2]/td[6]/input').click()
+            self.driver.find_element(By.XPATH, '//input[@value="Add Bonds"]').click()
+            resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"ssbond_chain1_")]') if i.is_displayed()]
+            resid = resids[-1][-1]
+            Select(self.driver.find_element(By.ID, f'ssbond_chain1_{resid}')).select_by_value(chain1)
+            Select(self.driver.find_element(By.ID, f'ssbond_resid1_{resid}')).select_by_value(rid1)
+            Select(self.driver.find_element(By.ID, f'ssbond_chain2_{resid}')).select_by_value(chain2)
+            Select(self.driver.find_element(By.ID, f'ssbond_resid2_{resid}')).select_by_value(rid2)
+    
+    def add_phosphorylation(self, chain, res_i, rid, res_p):
+        if chain is None:
+            pass
+        else:
+            if not self.driver.find_element(By.ID, 'id_phos').is_displayed():
+                self.driver.find_element(By.ID, 'phos_checked').click()
+                self.driver.find_element(By.XPATH, '//*[@id="id_phos_table"]/tr[2]/td[5]/input').click()
+            self.driver.find_element(By.XPATH, '//input[@value="Add Phosphorylation"]').click()
+            resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"phos_chain_")]') if i.is_displayed()]
+            resid = resids[-1][-1]
+            Select(self.driver.find_element(By.ID, f'phos_chain_{resid}')).select_by_value(chain)
+            Select(self.driver.find_element(By.ID, f'phos_res_{resid}')).select_by_value(res_i)
+            Select(self.driver.find_element(By.ID, f'phos_rid_{resid}')).select_by_value(rid)
+            Select(self.driver.find_element(By.ID, f'phos_patch_{resid}')).select_by_value(res_p)
+
+    
+    
+    def sugar_options(self, sugar_id=1,link=None,ltype='B', sname='GLC'):
+        Select(self.driver.find_element(By.ID, f'seq_name_{sugar_id}')).select_by_value(sname)
+        Select(self.driver.find_element(By.ID, f'seq_type_{sugar_id}')).select_by_value(ltype)
+        if link != None:
+            Select(self.driver.find_element(By.ID, f'seq_link_{sugar_id}')).select_by_value(str(link))
+
+
+
+    def add_sugar(self, sid='1'):
+        self.driver.find_element(By.ID, sid).find_element(By.CLASS_NAME, 'add').click()
+
+
+    def add_modification(self, sname= None, sugar_id = None, mod=None):
+        '''
+        add check to see if chem_checked is checked
+        '''
+        if mod == None:
+            return
+        if not self.driver.find_element(By.XPATH, '//input[@value="Add chemical modification"]').is_displayed():
+            self.driver.find_element(By.ID, 'chem_checked').click()
+        else:
+            self.driver.find_element(By.XPATH, '//input[@value="Add chemical modification"]').click()
+        resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"chem_res_")]') if i.is_displayed()]
+        if len(resids) == 0:
+            resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"chem_resid_")]') if i.is_displayed()]
+        resid = resids[-1][-1]
+        try:
+            if self.driver.find_element(By.ID, f'chem_res_{resid}').is_displayed():
+                Select(self.driver.find_element(By.ID, f'chem_res_{resid}')).select_by_value(sname)
+        except:
+            pass
+        Select(self.driver.find_element(By.ID, f'chem_resid_{resid}')).select_by_value(str(sugar_id))
+        Select(self.driver.find_element(By.ID, f'chem_site_{resid}')).select_by_value(mod[0])
+        Select(self.driver.find_element(By.ID, f'chem_patch_{resid}')).select_by_value(mod[1:])
+    
+    
+    def GRS_reader(self, GRS=None, skip=1):
+        if GRS is None:
+            pass
+        else:
+            lipids_dict = {'CER': 'CER', 'PIC': 'PICER', 'DAG': 'DAG', 'PID': 'PIDAG', 'ACYL':'ACYL'}
+            sugars_dict = {}
+            branch_length = [(1,1)]
+            ## Making the sugar dictionary ##
+            for i in GRS.split('\n'):
+                sug = i.split(' ')
+                if len(sug) > 2:
+                    if '_' in sug[-1]:
+                        sug = sug[:-1] + sug[-1].split('_')
+                    else:
+                        sug += [None]
+                    sugars_dict[int(sug[0])] = {'sname': sug[-2][1:], 'sugar_id': int(sug[0])-1, 'ltype': sug[-2][0], 'mod': sug[-1]} 
+                    if  sugars_dict[int(sug[0])]['sugar_id'] != 1:
+                        sugars_dict[int(sug[0])]['link'] =  sug[-3][1]
+                        if len(sug) > 1:
+                            for j in branch_length[::-1]:
+                                if len(sug)-3 > j[1]:
+                                    branch_length.append((int(sug[0])-1, len(sug)-3))
+                                    sugars_dict[int(sug[0])]['branch'] = j[0]
+                                    break
+                if len(sug) == 2:
+                    if sug[-1][:3] != 'PRO':
+                        sugars_dict[int(sug[0])] = {'lipid_type': lipids_dict[sug[-1].replace('-','')[:3]],'lipid_tail': sug[-1]}
+                    else:
+                        sugars_dict[int(sug[0])] = {'chain': sug[-1][:4], 'residue': sug[-1][-4:-1], 'resid': sug[-1][-1]}
+
+            # Adding the sugars ##
+            for i in range(skip,1+len(sugars_dict)):
+                if i == 1:
+                    if sugars_dict[i].get('lipid_type') is not None:
+                        Select(self.driver.find_element(By.ID, 'lipid_types')).select_by_value(sugars_dict[i]['lipid_type'])
+                        Select(self.driver.find_element(By.ID, 'seq_name_0')).select_by_value(sugars_dict[i]['lipid_tail'])
+                    else:
+                        Select(self.driver.find_element(By.ID, 'seq_name_0')).select_by_value(sugars_dict[i]['chain'])
+                        Select(self.driver.find_element(By.ID, 'seq_name2_0')).select_by_value(sugars_dict[i]['residue'])
+                        Select(self.driver.find_element(By.ID, 'seq_name3_0')).select_by_value(sugars_dict[i]['resid'])
+                elif i == 2:
+                    self.sugar_options(sugar_id = sugars_dict[i]['sugar_id'], link = sugars_dict[i].get('link', None), ltype = sugars_dict[i]['ltype'], sname =sugars_dict[i]['sname'])
+                    self.add_modification(sname= sugars_dict[i]['sname'], sugar_id = sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
+                else:
+                    self.add_sugar(sugars_dict[i]['branch'])
+                    self.sugar_options(sugar_id = sugars_dict[i]['sugar_id'], link = sugars_dict[i].get('link', None), ltype = sugars_dict[i]['ltype'], sname =sugars_dict[i]['sname'])
+                    self.add_modification(sname= sugars_dict[i]['sname'], sugar_id = sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
+    
+    
+    
+    def add_gpi(self, GRS=None, chain=None, skip=6):
+        if GRS is None:
+            pass
+        else:        
+            self.driver.find_element(By.ID, 'gpi_checked').click()
+            Select(self.driver.find_element(By.ID, 'gpi_chain')).select_by_value(f'{chain}')
+            main_window = self.driver.window_handles[0]
+            self.driver.find_element(By.XPATH, '//*[@id="gpi"]/td[4]/input').click()
+            popup = self.driver.window_handles[-1]
+            self.driver.switch_to.window(popup)
+            time.sleep(2)
+            self.GRS_reader(GRS, skip=skip)
+            self.nxt()
+            self.driver.switch_to.window(main_window)
+
+    def add_glycan(self, GRS, skip=1):
+        if GRS is None:
+            pass
+        else:  
+            if not self.driver.find_element(By.ID, 'add_glycosylation').is_displayed():
+                self.driver.find_element(By.ID, 'glyc_checked').click()
+            self.driver.find_element(By.ID, 'add_glycosylation').click()
+            main_window = self.driver.window_handles[0]
+            glyc_id = self.driver.find_elements(By.XPATH, '//*[starts-with(@id, "glycan_CAR")]')[-1].get_attribute('id')
+            self.driver.find_element(By.XPATH, f'//*[@id="{glyc_id}"]/td[5]/input').click()
+
+            popup = self.driver.window_handles[-1]
+            self.driver.switch_to.window(popup)
+            time.sleep(2)
+            self.GRS_reader(GRS, skip=skip)
+            self.nxt()
+            self.driver.switch_to.window(main_window)
+    
+    
+    def patch(self, chain=None, ter=None, ter_patch=None):
+        if chain is None:
+            pass
+        else:  
+            Select(self.driver.find_element(By.NAME, f'terminal[{chain}][{ter}]')).select_by_value(f'{ter_patch}')
 
     def waterbox(self, size='implicit', shape = 'rect', dis=10.0, X=10.0, Y=10.0, Z=10.0):
         '''
@@ -161,12 +356,24 @@ class CharmmGuiAuto:
             t = self.driver.find_element(By.NAME, 'temperature')
             t.clear()
             t.send_keys(temp)
+            
+    def download(self, jobid):
+        print('starting download')
+        self.driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
+        while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
+            time.sleep(10)
+        print('Download done - unpacking starting')
+        os.system(f'mkdir output2')
+        os.system(f'tar -xvf {out_tmp}/charmm-gui.tgz -C output2/')
+        os.system(f'rm -r {out_tmp}')
+        print('Unpacked')
 
 
+# In[100]:
 
 
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, file_name, path, chains = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
+    def run(self, email, password, file_name, path, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
         self.login(email,password)
         self.wait_text("Protein Solution System")
         self.upload(file_name, path)
@@ -178,6 +385,25 @@ class SolutionProtein(CharmmGuiAuto):
         if chains != None:
             for chain in chains:
                 self.patch(chain[0], chain[1], chain[2])
+                
+        self.preserve(**preserve) # option
+        if mutations != None:
+            for mutation in mutations:
+                self.add_mutation(**mutation) # chain, rid, aa 
+        if protonations != None:
+            for protonation in protonations:
+                self.add_protonation(**protonation) #chain,res_i,rid,res_p
+        if disulfides != None:
+            for disulfide in disulfides:
+                self.add_disulfide(**disulfide) #chain1, rid1, chain2, rid2
+        if phosphorylations != None:
+            for phosphorylation in phosphorylations:
+                self.add_phosphorylation(**phosphorylation) #chain,res_i,rid_res_p
+        self.add_gpi(**gpi, skip=6) #GRS,chain,skip=6
+        if glycans != None:
+            for glycan in glycans:
+                self.add_glycan(**glycan, skip=1) # GRS,skip=1
+        
         self.nxt()
         self.wait_text("Add Ions")
         self.waterbox(**waterbox)
@@ -195,9 +421,11 @@ class SolutionProtein(CharmmGuiAuto):
         self.nxt()
         self.wait_text("to continue equilibration and production simulations")
         print(f'Ready to download from retrive job id {jobid}')
+        self.download(jobid)
         self.driver.quit()
 
 
+# In[101]:
 
 
 class MembraneProtein(CharmmGuiAuto):
@@ -376,34 +604,7 @@ class MembraneProtein(CharmmGuiAuto):
 
         
         
-    def sugar_options(self, sugar_id=1,link=None,ltype='B', sname='GLC'):
-        Select(self.driver.find_element(By.ID, f'seq_name_{sugar_id}')).select_by_value(sname)
-        Select(self.driver.find_element(By.ID, f'seq_type_{sugar_id}')).select_by_value(ltype)
-        if link != None:
-            Select(self.driver.find_element(By.ID, f'seq_link_{sugar_id}')).select_by_value(str(link))
-
-
-
-    def add_sugar(self, sid='1'):
-        self.driver.find_element(By.ID, sid).find_element(By.CLASS_NAME, 'add').click()
-
-
-    def add_modification(self, sname= None, sugar_id = None, mod=None):
-        '''
-        add check to see if chem_checked is checked
-        '''
-        if mod == None:
-            return
-        if not self.driver.find_element(By.XPATH, '//input[@value="Add chemical modification"]').is_displayed():
-            self.driver.find_element(By.ID, 'chem_checked').click()
-        else:
-            dself.river.find_element(By.XPATH, '//input[@value="Add chemical modification"]').click()
-        resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"chem_res_")]') if i.is_displayed()]
-        resid = resids[-1][-1]
-        Select(self.driver.find_element(By.ID, f'chem_res_{resid}')).select_by_value(sname)
-        Select(self.driver.find_element(By.ID, f'chem_resid_{resid}')).select_by_value(str(sugar_id))
-        Select(self.driver.find_element(By.ID, f'chem_site_{resid}')).select_by_value(mod[0])
-        Select(self.driver.find_element(By.ID, f'chem_patch_{resid}')).select_by_value(mod[1:])
+    
 
     def add_glycolipid(self, GRS, upper=1, lower=1):
         prevs = [i.get_attribute('value') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "GLP")]')]
@@ -420,43 +621,7 @@ class MembraneProtein(CharmmGuiAuto):
         self.driver.switch_to.window(popup)
         time.sleep(2)
 
-        lipids_dict = {'CER': 'CER', 'PIC': 'PICER', 'DAG': 'DAG', 'PID': 'PIDAG', 'ACYL':'ACYL'}
-
-        sugars_dict = {}
-        branch_length = [(1,1)]
-        ## Making the sugar dictionary ##
-        for i in GRS.split('\n'):
-            sug = i.split(' ')
-            if len(sug) > 2:
-                if '_' in sug[-1]:
-                    sug = sug[:-1] + sug[-1].split('_')
-                else:
-                    sug += [None]
-                sugars_dict[int(sug[0])] = {'sname': sug[-2][1:], 'sugar_id': int(sug[0])-1, 'ltype': sug[-2][0], 'mod': sug[-1]} 
-                if  sugars_dict[int(sug[0])]['sugar_id'] != 1:
-                    sugars_dict[int(sug[0])]['link'] =  sug[-3][1]
-                    if len(sug) > 1:
-                        for j in branch_length[::-1]:
-                            if len(sug)-3 > j[1]:
-                                branch_length.append((int(sug[0])-1, len(sug)-3))
-                                sugars_dict[int(sug[0])]['branch'] = j[0]
-                                break
-            if len(sug) == 2:
-                sugars_dict[int(sug[0])] = {'lipid_type': lipids_dict[sug[-1].replace('-','')[:3]],'lipid_tail': sug[-1]}
-
-
-        # Adding the sugars ##
-        for i in range(1,1+len(sugars_dict)):
-            if i == 1:
-                Select(self.driver.find_element(By.ID, 'lipid_types')).select_by_value(sugars_dict[i]['lipid_type'])
-                Select(self.driver.find_element(By.ID, 'seq_name_0')).select_by_value(sugars_dict[i]['lipid_tail'])
-            elif i == 2:
-                self.sugar_options(sugar_id = sugars_dict[i]['sugar_id'], link = sugars_dict[i].get('link', None), ltype = sugars_dict[i]['ltype'], sname =sugars_dict[i]['sname'])
-                self.add_modification(sname= sugars_dict[i]['sname'], sugar_id = sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
-            else:
-                self.add_sugar(sugars_dict[i]['branch'])
-                self.sugar_options(sugar_id = sugars_dict[i]['sugar_id'], link = sugars_dict[i].get('link', None), ltype = sugars_dict[i]['ltype'], sname =sugars_dict[i]['sname'])
-                self.add_modification(sname= sugars_dict[i]['sname'], sugar_id = sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
+        self.GRS_reader(GRS=GRS, skip=1)
 
         self.nxt()
         self.driver.switch_to.window(main_window)
@@ -469,7 +634,7 @@ class MembraneProtein(CharmmGuiAuto):
         
         
 
-    def run(self, email, password, file_name, path, chains = None, orientation = 'PDB', position = None, area=None, projection = None, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+    def run(self, email, password, file_name, path, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = None, area=None, projection = None, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
         self.login(email,password)
         self.wait_text("Protein/Membrane System")
         self.upload(file_name, path)
@@ -481,6 +646,25 @@ class MembraneProtein(CharmmGuiAuto):
         if chains != None:
             for chain in chains:
                 self.patch(chain[0], chain[1], chain[2])
+
+        self.preserve(**preserve) # option
+        if mutations != None:
+            for mutation in mutations:
+                self.add_mutation(**mutation) # chain, rid, aa 
+        if protonations != None:
+            for protonation in protonations:
+                self.add_protonation(**protonation) #chain,res_i,rid,res_p
+        if disulfides != None:
+            for disulfide in disulfides:
+                self.add_disulfide(**disulfide) #chain1, rid1, chain2, rid2
+        if phosphorylations != None:
+            for phosphorylation in phosphorylations:
+                self.add_phosphorylation(**phosphorylation) #chain,res_i,rid_res_p
+        self.add_gpi(**gpi, skip=6) #GRS,chain,skip=6
+        if glycans != None:
+            for glycan in glycans:
+                self.add_glycan(**glycan, skip=1) # GRS,skip=1
+                
         self.nxt()
         self.wait_text("Area Calculation Options")
         self.orientation(**orientation)
@@ -494,17 +678,16 @@ class MembraneProtein(CharmmGuiAuto):
         self.lengthXY('ratio', size)
         if lipids != None:
             for lipid in lipids:
-                self.add_lipid(lipid[0], lipid[1], lipid[2])
+                self.add_lipid(**lipid)
         if naas != None:
             for naa in naas:
-                self.add_naa(naa[0], naa[1], naa[2], naa[3], naa[4])
+                self.add_naa(**naa)
         if pegs != None:
             for peg in pegs:
-                self.add_peg(peg[0], peg[1], peg[2], peg[3], peg[4])
+                self.add_peg(**peg)
         if glycolipids != None:
             for glycolipid in glycolipids:
-                #self.add_glycolipid(glycolipid[0], glycolipid[1], glycolipid[2])
-                self.add_glycolipid(glycolipid['GRS'], glycolipid['upper'], glycolipid['lower'])
+                self.add_glycolipid(**glycolipid)
         self.show_system_info()
         self.wait_text('Calculated XY System Size')
         self.nxt()
@@ -526,6 +709,7 @@ class MembraneProtein(CharmmGuiAuto):
         print(f'Ready to download from retrive job id {jobid}')
 
 
+# In[102]:
 
 
 class Membrane(MembraneProtein):
@@ -544,17 +728,16 @@ class Membrane(MembraneProtein):
         self.lengthXY('ratio', size)
         if lipids != None:
             for lipid in lipids:
-                self.add_lipid(lipid[0], lipid[1], lipid[2])
+                self.add_lipid(**lipid)
         if naas != None:
             for naa in naas:
-                self.add_naa(naa[0], naa[1], naa[2], naa[3], naa[4])
+                self.add_naa(**naa)
         if pegs != None:
             for peg in pegs:
-                self.add_peg(peg[0], peg[1], peg[2], peg[3], peg[4])
+                self.add_peg(**peg)
         if glycolipids != None:
             for glycolipid in glycolipids:
-                #self.add_glycolipid(glycolipid[0], glycolipid[1], glycolipid[2])
-                self.add_glycolipid(glycolipid['GRS'], glycolipid['upper'], glycolipid['lower'])        
+                self.add_glycolipid(**glycolipid)        
         self.show_system_info()
         self.wait_text('Calculated XY System Size')
         self.nxt()
@@ -577,6 +760,7 @@ class Membrane(MembraneProtein):
         self.driver.quit()
 
 
+# In[98]:
 
 
 def main(system_type):
@@ -589,15 +773,295 @@ def main(system_type):
     else:
         print('System type must be specified')
 
-parser = argparse.ArgumentParser()
-parser.add_argument('input_file', type=str,
-                    help='The name of the input yaml file without the extension')
-args = parser.parse_args()
-
-
-
 if __name__ == "__main__":
-    with open(f'{args.input_file}.yaml', 'r') as stream:
+    with open("MP_example.yaml", 'r') as stream:
         parsed_yaml=yaml.safe_load(stream)
         print(parsed_yaml)
     main(**parsed_yaml['input0'])
+
+
+# In[67]:
+
+
+one = {1: {'chain': 'PROA', 'residue': 'THR', 'resid': '8'}, 2: {'sname': 'GLC', 'sugar_id': 1, 'ltype': 'B', 'mod': None}, 3: {'sname': 'GLC', 'sugar_id': 2, 'ltype': 'B', 'mod': None, 'link': '4', 'branch': 1}, 4: {'sname': 'GAL', 'sugar_id': 3, 'ltype': 'A', 'mod': None, 'link': '3', 'branch': 2}, 5: {'sname': 'GALNA', 'sugar_id': 4, 'ltype': 'B', 'mod': '3SUF', 'link': '3', 'branch': 3}}
+
+two = {1: {'chain': 'PROA', 'residue': 'THR', 'resid': '8'}, 2: {'sname': 'GLC', 'sugar_id': 1, 'ltype': 'B', 'mod': None}, 3: {'sname': 'GLC', 'sugar_id': 2, 'ltype': 'B', 'mod': None, 'link': '4', 'branch': 1}, 4: {'sname': 'GAL', 'sugar_id': 3, 'ltype': 'A', 'mod': None, 'link': '3', 'branch': 2}, 5: {'sname': 'GALNA', 'sugar_id': 4, 'ltype': 'B', 'mod': '3SUF', 'link': '3', 'branch': 3}}
+
+
+# In[ ]:
+
+
+
+
+
+# In[15]:
+
+
+# def run(self, email, password, file_name, path, chains = None, orientation = 'PDB', position = None, area=None, 
+# projection = None, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, 
+# size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'
+names_yaml = """
+input0:
+  system_type: MP
+input1:
+  head: False
+  system: membrane
+input2:
+  email: 201605043@post.au.dk
+  password: 6KNzBsY37wQc
+  file_name: ins_trans.pdb
+  path: /home/au555720/IR/TM/AA/CharmmGui
+  chains:
+    -
+      - PROB
+      - first
+      - ACE
+    - 
+      - PROB
+      - last
+      - CT3
+  orientation:
+    option: PDB
+  position: 
+    option: null
+  area: 
+    option: null
+  projection: 
+    option: null
+  boxtype: 
+    option: null
+  lengthZ: 
+    option: null
+  lipids:
+    -
+      - chl1
+      - 1
+      - 1
+    -
+      - popc
+      - 10
+      - 10
+  naas:
+    - 
+      - LAU
+      - GLY
+      - CTER
+      - 1
+      - 1
+  pegs:
+    -
+      - DAG
+      - DLGL
+      - 5
+      - 1
+      - 1
+  glycolipids:
+    -
+      GRS: | 
+           1 CER160
+           2 - 1B: BGLC
+           3 - - 14B: BGAL
+           4 - - - 13B: BGLCNA
+           5 - - - - 13B: BGAL
+           6 - - - - - 13A: AGAL
+           7 - - - - - 12A: AFUC
+      upper: 1
+      lower: 1
+  size: 100
+  ions: NaCl
+  ff: c36m
+  engine: gmx
+  temp: 310
+
+"""
+
+
+# In[54]:
+
+
+out_tmp
+
+
+# In[16]:
+
+
+out_tmp= yaml.safe_load(names_yaml)
+with open('MP_example.yaml', 'w') as file:
+    yaml.dump(names, file)
+
+
+# In[11]:
+
+
+with open("SP_example.yaml", 'r') as stream:
+        parsed_yaml=yaml.safe_load(stream)
+        print(parsed_yaml)
+
+
+# In[9]:
+
+
+# def run(self, email, password, file_name, path, chains = None, orientation = 'PDB', position = None, area=None, 
+# projection = None, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, 
+# size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'
+names_yaml = """
+input0:
+  system_type: SP
+input1:
+  head: False
+  system: solution
+input2:
+  email: 201605043@post.au.dk
+  password: 6KNzBsY37wQc
+  file_name: ins_trans.pdb
+  path: /home/au555720/IR/TM/AA/CharmmGui
+  chains:
+    -
+      - PROB
+      - first
+      - ACE
+    - 
+      - PROB
+      - last
+      - CT3
+  
+  waterbox:
+    dis: 15.0
+  ions: NaCl
+  ff: c36m
+  engine: gmx
+  temp: 310
+
+"""
+names = yaml.safe_load(names_yaml)
+with open('SP_example.yaml', 'w') as file:
+    yaml.dump(names, file)
+
+
+# In[24]:
+
+
+# def run(self, email, password, file_name, path, chains = None, orientation = 'PDB', position = None, area=None, 
+# projection = None, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, 
+# size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'
+names_yaml = """
+input0:
+  system_type: M
+input1:
+  head: False
+  system: membrane
+input2:
+  email: 201605043@post.au.dk
+  password: 6KNzBsY37wQc
+  boxtype: 
+    option: null
+  lengthZ: 
+    option: null
+  lipids:
+    -
+      - chl1
+      - 1
+      - 1
+    -
+      - popc
+      - 10
+      - 10
+  naas:
+    - 
+      - LAU
+      - GLY
+      - CTER
+      - 1
+      - 1
+  pegs:
+    -
+      - DAG
+      - DLGL
+      - 5
+      - 1
+      - 1
+  glycolipids:
+    -
+      GRS: | 
+           1 CER160
+           2 - 1B: BGLC
+           3 - - 14B: BGAL
+           4 - - - 13B: BGLCNA
+           5 - - - - 13B: BGAL
+           6 - - - - - 13A: AGAL
+           7 - - - - - 12A: AFUC
+      upper: 1
+      lower: 1
+  size: 100
+  ions: NaCl
+  ff: c36m
+  engine: gmx
+  temp: 310
+
+"""
+names = yaml.safe_load(names_yaml)
+with open('M_example.yaml', 'w') as file:
+    yaml.dump(names, file)
+
+
+# In[ ]:
+
+
+4440935830
+
+
+# In[27]:
+
+
+path_out = f'{os.getcwd()}/TMP'
+options = webdriver.FirefoxOptions();
+options.set_preference("browser.download.folderList", 2)
+options.set_preference("browser.download.manager.showWhenStarting", False)
+options.set_preference("browser.download.dir", path_out)
+options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
+options.set_preference("browser.download.improvements_to_download_panel", True);
+options.set_preference("browser.download.manager.closeWhenDone", True)
+driver = webdriver.Firefox(options=options)
+driver.get('https://charmm-gui.org/?doc=input/solution&step=4&project=solution&jobid=4440935830')
+
+
+# In[12]:
+
+
+driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
+
+
+# In[18]:
+
+
+driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
+while not os.path.isfile(f'{path_out}/charmm-gui.tgz'):
+    time.sleep(10)
+os.system(f'tar -xvf {path_out}/charmm-gui.tgz -C {path_out}')
+
+
+# In[17]:
+
+
+os.system(f'tar -xvf {path_out}/charmm-gui.tgz -C {path_out}')
+
+
+# In[33]:
+
+
+print('starting download')
+driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
+while not os.path.isfile(f'{path_out}/charmm-gui.tgz'):
+    time.sleep(10)
+print('Download done - unpacking starting')
+os.system(f' mkdir output')
+os.system(f'tar -xvf {path_out}/charmm-gui.tgz -C output')
+os.system(f'rm -r {path_out}')
+print('Unpacked')
+
+
+# In[ ]:
+
+
+
+
