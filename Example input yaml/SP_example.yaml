@@ -1,9 +1,59 @@
 input0:
   system_type: SP
 input1:
-  head: true
+  headless: false
   system: solution
+  path_out: /home/au555720/IR/TM/AA/CharmmGui
 input2:
+  preserve: 
+    option: null
+  mutations:
+    - 
+      chain: PROA
+      rid: '2'
+      aa: ALA
+  protonations:
+    -
+      chain: PROA
+      res_i: GLU
+      rid: '4'
+      res_p: GLUP
+  disulfides:
+    -
+      chain1: PROA
+      rid1: '6'
+      chain2: PROA
+      rid2: '7'
+  phosphorylations:
+    -
+      chain: PROA 
+      res_i: TYR
+      rid: '14'
+      res_p: TP1
+      #  gpi:
+      #    GRS: '1 PI-DAG-DS
+      #
+      #      2 - 16A: AGLCN
+      #
+      #      3 - - 14A: AMAN
+      #
+      #      4 - - - 16A: AMAN
+      #
+      #      5 - - - - 12A: AMAN_6PEA
+      #      
+      #      6 - - - - - 11B: BGAL_1SUF'
+      #    chain: PROA
+      #  glycans:
+      #    -
+      #      GRS: '1 PROA-THR8
+      #
+      #        2 - 12B: BGLC
+      #
+      #        3 - - 14B: BGLC
+      #
+      #        4 - - - 13B: AGAL
+      #
+      #        5 - - - - 13B: BGALNA_3SUF'
   chains:
   - - PROB
     - first
@@ -11,13 +61,13 @@ input2:
   - - PROB
     - last
     - CT3
-  email: ## ADD YOUR USER EMAIL TO CHARMM-GUI ##
+  email: 201605043@post.au.dk
   engine: gmx
   ff: c36m
   file_name: ins_trans.pdb
   ions: NaCl
-  password: ## ADD YOUR USER PASSWORD TO CHARMM-GUI ##
-  path: ## ADD THE PATH TO THE PDB FILE ##
+  password: 6KNzBsY37wQc
+  path: /home/au555720/IR/TM/AA/CharmmGui
   temp: 310
   waterbox:
     dis: 15.0
