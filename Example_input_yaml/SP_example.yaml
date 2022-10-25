@@ -1,10 +1,10 @@
-input0:
+system_type:
   system_type: SP
-input1:
+system_info:
   headless: false
   system: solution
   path_out: ## INSERT OUTPUT PATH ##
-input2:
+details:
   preserve: 
     option: yes
   mutations:

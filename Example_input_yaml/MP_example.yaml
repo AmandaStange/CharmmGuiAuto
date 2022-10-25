@@ -1,10 +1,10 @@
-input0:
+system_type:
   system_type: MP
-input1:
+system_info:
   headless: false
   system: membrane
   path_out: ## INSERT YOUR OUTPUT PATH HERE ##
-input2:
+details:
   area:
     option: null
   boxtype:

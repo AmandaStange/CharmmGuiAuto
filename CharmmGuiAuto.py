@@ -13,6 +13,9 @@ import time
 import os
 import sys
 import yaml
+import argparse
+import random
+import string
 
 
 class CharmmGuiAuto:
@@ -22,7 +25,9 @@ class CharmmGuiAuto:
         system = membrane or solution
         '''
         global out_tmp
-        out_tmp = f'{path_out}/TMP'
+        letters = string.ascii_letters
+        out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
+        print(out_tmp)
         options = webdriver.FirefoxOptions();
         options.set_preference("browser.download.folderList", 2)
         options.set_preference("browser.download.manager.showWhenStarting", False)
@@ -49,6 +54,10 @@ class CharmmGuiAuto:
         choose_file = self.driver.find_element(By.NAME, 'file')
         file_location = os.path.join(path, file_name)
         choose_file.send_keys(file_location)
+        self.driver.find_element(By.ID, 'nav_title').click()
+
+    def from_pdb(self, pdb_id):
+        self.driver.find_element(By.NAME, 'pdb_id').send_keys(pdb_id)
         self.driver.find_element(By.ID, 'nav_title').click()
         
     def wait_text(self,text,start_time=None):
@@ -347,25 +356,28 @@ class CharmmGuiAuto:
             t.send_keys(temp)
             
     def download(self, jobid):
+        os.system(f'mkdir {out_tmp}')
         print('starting download')
         self.driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
-        os.system(f'mkdir output')
-        os.system(f'tar -xvf {out_tmp}/charmm-gui.tgz -C output/')
+        #os.system(f'rm -r {out_tmp}')
+        
+        time.sleep(10)
+        os.system(f'tar -xvf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
         os.system(f'rm -r {out_tmp}')
         print('Unpacked')
 
 
-# In[100]:
-
-
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, file_name, path, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
         self.login(email,password)
         self.wait_text("Protein Solution System")
-        self.upload(file_name, path)
+        if file_name is not None:
+            self.upload(file_name, path)
+        else:
+            self.from_pdb(pdb_id)
         self.wait_text("Model/Chain Selection Option")
         jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
         print(jobid)
@@ -623,10 +635,13 @@ class MembraneProtein(CharmmGuiAuto):
         
         
 
-    def run(self, email, password, file_name, path, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = None, area=None, projection = None, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = None, area=None, projection = None, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
         self.login(email,password)
         self.wait_text("Protein/Membrane System")
-        self.upload(file_name, path)
+        if file_name is not None:
+            self.upload(file_name, path)
+        else:
+            self.from_pdb(pdb_id)
         self.wait_text("Model/Chain Selection Option")
         jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
         print(jobid)
@@ -695,7 +710,7 @@ class MembraneProtein(CharmmGuiAuto):
         self.temperature(temp)
         self.nxt()
         self.wait_text("to continue equilibration and production simulations")
-        self.downlad(jobid)
+        self.download(jobid)
         print(f'Ready to download from retrive job id {jobid}')
 
 
@@ -747,7 +762,7 @@ class Membrane(MembraneProtein):
         self.nxt()
         self.wait_text("Equilibration Input Notes")
         print(f'Ready to download from retrive job id {jobid}')
-        self.downlad(jobid)
+        self.download(jobid)
         self.driver.quit()
 
 
@@ -756,19 +771,27 @@ class Membrane(MembraneProtein):
 
 def main(system_type):
     if system_type == 'SP':
-        SolutionProtein(**parsed_yaml['input1']).run(**parsed_yaml['input2'])
+        SolutionProtein(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'MP':
-        MembraneProtein(**parsed_yaml['input1']).run(**parsed_yaml['input2'])
+        MembraneProtein(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'M':
-        Membrane(**parsed_yaml['input1']).run(**parsed_yaml['input2'])
+        Membrane(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     else:
         print('System type must be specified')
 
+def create_arg_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', help='Input yaml name', default='input.yaml')
+    return parser
+
 if __name__ == "__main__":
-    with open("MP_example.yaml", 'r') as stream:
+    parser = create_arg_parser()
+    args = parser.parse_args()
+    input_file = args.input
+    with open(input_file, 'r') as stream:
         parsed_yaml=yaml.safe_load(stream)
         print(parsed_yaml)
-    main(**parsed_yaml['input0'])
+    main(**parsed_yaml['system_type'])
 
 
 
