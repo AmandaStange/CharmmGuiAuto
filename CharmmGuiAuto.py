@@ -780,8 +780,11 @@ def main(system_type):
         print('System type must be specified')
 
 def create_arg_parser():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,
+                    help='Script to automate CharmmGui process.')
     parser.add_argument('-i', '--input', help='Input yaml name', default='input.yaml')
+    
     return parser
 
 if __name__ == "__main__":
