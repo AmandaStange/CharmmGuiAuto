@@ -20,12 +20,12 @@ A yaml file is required as input for the script and there are examples of input 
 
 Command to run:
 ```
-python CharmmGuiAuto.py -i NAME_OF_INPUT_FILE
+python CharmmGuiAuto.py -i NAME_OF_INPUT_FILE.yaml
 ```
 
 Suggested command:
 ```
-python -u CharmmGuiAuto.py -i NAME_OF_INPUT_FILE > NAME_OF_LOG_FILE
+python -u CharmmGuiAuto.py -i NAME_OF_INPUT_FILE.yaml > NAME_OF_LOG_FILE
 ```
 
 Please inform me if anything is not working or if any function arguments are not clear
