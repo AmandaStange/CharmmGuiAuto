@@ -1,0 +1,44 @@
+input0:
+  system_type: MP
+input1:
+  headless: true 
+  system: membrane
+  path_out:  /home/au555720/charmm_auto/charmmgui/ 
+input2:
+  preserve: 
+    option: yes
+  chains:
+  - - PROB
+    - first
+    - ACE
+  - - PROB
+    - last
+    - CT3
+  lengthZ:
+    option: null
+  lipids:
+  -
+    lipid: chl1
+    upper: 1
+    lower: 1
+  -
+    lipid: popc
+    upper: 10
+    lower: 10
+  naas:
+  -
+    lipid: LAU
+    aa: GLY
+    cter: CTER
+    lower: 1
+    upper: 1
+  orientation:
+    option: PDB
+  email: 201605043@post.au.dk 
+  engine: gmx
+  ff: c36m
+  file_name: ins_trans.pdb
+  ions: NaCl
+  password: 6KNzBsY37wQc 
+  path: /home/au555720/charmm_auto/charmmgui/Example_input_yaml/
+  temp: 310
