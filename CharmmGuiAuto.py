@@ -16,6 +16,7 @@ import yaml
 import argparse
 import random
 import string
+import traceback
 
 
 class CharmmGuiAuto:
@@ -26,6 +27,7 @@ class CharmmGuiAuto:
         '''
         global out_tmp
         letters = string.ascii_letters
+        self.path_out = path_out
         out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
         print(out_tmp)
         options = webdriver.FirefoxOptions();
@@ -365,65 +367,71 @@ class CharmmGuiAuto:
         #os.system(f'rm -r {out_tmp}')
         
         time.sleep(10)
-        os.system(f'tar -xvf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
+        os.system(f'tar -xf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
         os.system(f'rm -r {out_tmp}')
         print('Unpacked')
 
 
 class SolutionProtein(CharmmGuiAuto):
     def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
-        self.login(email,password)
-        self.wait_text("Protein Solution System")
-        if file_name is not None:
-            self.upload(file_name, path)
-        else:
-            self.from_pdb(pdb_id)
-        self.wait_text("Model/Chain Selection Option")
-        jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
-        print(jobid)
-        self.nxt()
-        self.wait_text("PDB Manipulation Options")
-        if chains != None:
-            for chain in chains:
-                self.patch(chain[0], chain[1], chain[2])
-                
-        self.preserve(**preserve) # option
-        if mutations != None:
-            for mutation in mutations:
-                self.add_mutation(**mutation) # chain, rid, aa 
-        if protonations != None:
-            for protonation in protonations:
-                self.add_protonation(**protonation) #chain,res_i,rid,res_p
-        if disulfides != None:
-            for disulfide in disulfides:
-                self.add_disulfide(**disulfide) #chain1, rid1, chain2, rid2
-        if phosphorylations != None:
-            for phosphorylation in phosphorylations:
-                self.add_phosphorylation(**phosphorylation) #chain,res_i,rid_res_p
-        self.add_gpi(**gpi, skip=6) #GRS,chain,skip=6
-        if glycans != None:
-            for glycan in glycans:
-                self.add_glycan(**glycan, skip=1) # GRS,skip=1
-        
-        self.nxt()
-        self.wait_text("Add Ions")
-        self.waterbox(**waterbox)
-        self.ion_method(ion_method)
-        self.clear_ion()
-        self.add_ion(ions)
-        self.calc_solv()
-        self.nxt()
-        self.wait_text('Periodic Boundary Condition Options')
-        self.nxt()
-        self.wait_text("Force Field Options")
-        self.force_field(ff)
-        self.engine(engine)
-        self.temperature(temp)
-        self.nxt()
-        self.wait_text("to continue equilibration and production simulations")
-        print(f'Ready to download from retrive job id {jobid}')
-        self.download(jobid)
-        self.driver.quit()
+        try:
+            self.login(email,password)
+            self.wait_text("Protein Solution System")
+            if file_name is not None:
+                self.upload(file_name, path)
+            else:
+                self.from_pdb(pdb_id)
+            self.wait_text("Model/Chain Selection Option")
+            jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
+            print(jobid)
+            self.nxt()
+            self.wait_text("PDB Manipulation Options")
+            if chains != None:
+                for chain in chains:
+                    self.patch(chain[0], chain[1], chain[2])
+                    
+            self.preserve(**preserve) # option
+            if mutations != None:
+                for mutation in mutations:
+                    self.add_mutation(**mutation) # chain, rid, aa 
+            if protonations != None:
+                for protonation in protonations:
+                    self.add_protonation(**protonation) #chain,res_i,rid,res_p
+            if disulfides != None:
+                for disulfide in disulfides:
+                    self.add_disulfide(**disulfide) #chain1, rid1, chain2, rid2
+            if phosphorylations != None:
+                for phosphorylation in phosphorylations:
+                    self.add_phosphorylation(**phosphorylation) #chain,res_i,rid_res_p
+            self.add_gpi(**gpi, skip=6) #GRS,chain,skip=6
+            if glycans != None:
+                for glycan in glycans:
+                    self.add_glycan(**glycan, skip=1) # GRS,skip=1
+            
+            self.nxt()
+            self.wait_text("Add Ions")
+            self.waterbox(**waterbox)
+            self.ion_method(ion_method)
+            self.clear_ion()
+            self.add_ion(ions)
+            self.calc_solv()
+            self.nxt()
+            self.wait_text('Periodic Boundary Condition Options')
+            self.nxt()
+            self.wait_text("Force Field Options")
+            self.force_field(ff)
+            self.engine(engine)
+            self.temperature(temp)
+            self.nxt()
+            self.wait_text("to continue equilibration and production simulations")
+            print(f'Ready to download from retrive job id {jobid}')
+            self.download(jobid)
+            self.driver.quit()
+            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+        except:
+            traceback.print_exc()
+            print('Exception raised')
+            self.driver.quit()
 
 
 # In[101]:
@@ -635,84 +643,88 @@ class MembraneProtein(CharmmGuiAuto):
         
         
 
-    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = None, area=None, projection = None, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
-        self.login(email,password)
-        self.wait_text("Protein/Membrane System")
-        if file_name is not None:
-            self.upload(file_name, path)
-        else:
-            self.from_pdb(pdb_id)
-        self.wait_text("Model/Chain Selection Option")
-        jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
-        print(jobid)
-        self.nxt()
-        self.wait_text("PDB Manipulation Options")
-        if chains != None:
-            for chain in chains:
-                self.patch(chain[0], chain[1], chain[2])
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+        try:
+            self.login(email,password)
+            self.wait_text("Protein/Membrane System")
+            if file_name is not None:
+                self.upload(file_name, path)
+            else:
+                self.from_pdb(pdb_id)
+            self.wait_text("Model/Chain Selection Option")
+            jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
+            print(jobid)
+            self.nxt()
+            self.wait_text("PDB Manipulation Options")
+            if chains != None:
+                for chain in chains:
+                    self.patch(chain[0], chain[1], chain[2])
 
-        self.preserve(**preserve) # option
-        if mutations != None:
-            for mutation in mutations:
-                self.add_mutation(**mutation) # chain, rid, aa 
-        if protonations != None:
-            for protonation in protonations:
-                self.add_protonation(**protonation) #chain,res_i,rid,res_p
-        if disulfides != None:
-            for disulfide in disulfides:
-                self.add_disulfide(**disulfide) #chain1, rid1, chain2, rid2
-        if phosphorylations != None:
-            for phosphorylation in phosphorylations:
-                self.add_phosphorylation(**phosphorylation) #chain,res_i,rid_res_p
-        self.add_gpi(**gpi, skip=6) #GRS,chain,skip=6
-        if glycans != None:
-            for glycan in glycans:
-                self.add_glycan(**glycan, skip=1) # GRS,skip=1
-                
-        self.nxt()
-        self.wait_text("Area Calculation Options")
-        self.orientation(**orientation)
-        self.position(**position)
-        self.area(**area)
-        self.nxt()
-        self.wait_text('default surface area')
-        self.projection(**projection)
-        self.box_type(**boxtype)
-        self.lengthZ(**lengthZ)
-        self.lengthXY('ratio', size)
-        if lipids != None:
-            for lipid in lipids:
-                self.add_lipid(**lipid)
-        if naas != None:
-            for naa in naas:
-                self.add_naa(**naa)
-        if pegs != None:
-            for peg in pegs:
-                self.add_peg(**peg)
-        if glycolipids != None:
-            for glycolipid in glycolipids:
-                self.add_glycolipid(**glycolipid)
-        self.show_system_info()
-        self.wait_text('Calculated XY System Size')
-        self.nxt()
-        self.wait_text("Component Building Options")
-        self.clear_ion()
-        self.add_ion('NaCl')
-        self.driver.find_element(By.XPATH, "//*[starts-with(@onclick, 'update_nion')]").click()
-        self.nxt()
-        self.wait_text('Building Ion and Waterbox')
-        self.nxt()
-        self.wait_text('Assemble Generated Components')
-        self.nxt()
-        self.wait_text("Force Field Options")
-        self.force_field(ff)
-        self.engine(engine)
-        self.temperature(temp)
-        self.nxt()
-        self.wait_text("to continue equilibration and production simulations")
-        self.download(jobid)
-        print(f'Ready to download from retrive job id {jobid}')
-
+            self.preserve(**preserve) # option
+            if mutations != None:
+                for mutation in mutations:
+                    self.add_mutation(**mutation) # chain, rid, aa 
+            if protonations != None:
+                for protonation in protonations:
+                    self.add_protonation(**protonation) #chain,res_i,rid,res_p
+            if disulfides != None:
+                for disulfide in disulfides:
+                    self.add_disulfide(**disulfide) #chain1, rid1, chain2, rid2
+            if phosphorylations != None:
+                for phosphorylation in phosphorylations:
+                    self.add_phosphorylation(**phosphorylation) #chain,res_i,rid_res_p
+            self.add_gpi(**gpi, skip=6) #GRS,chain,skip=6
+            if glycans != None:
+                for glycan in glycans:
+                    self.add_glycan(**glycan, skip=1) # GRS,skip=1
+                    
+            self.nxt()
+            self.wait_text("Area Calculation Options")
+            self.orientation(**orientation)
+            self.position(**position)
+            self.area(**area)
+            self.nxt()
+            self.wait_text('default surface area')
+            self.projection(**projection)
+            self.box_type(**boxtype)
+            self.lengthZ(**lengthZ)
+            self.lengthXY('ratio', size)
+            if lipids != None:
+                for lipid in lipids:
+                    self.add_lipid(**lipid)
+            if naas != None:
+                for naa in naas:
+                    self.add_naa(**naa)
+            if pegs != None:
+                for peg in pegs:
+                    self.add_peg(**peg)
+            if glycolipids != None:
+                for glycolipid in glycolipids:
+                    self.add_glycolipid(**glycolipid)
+            self.show_system_info()
+            self.wait_text('Calculated XY System Size')
+            self.nxt()
+            self.wait_text("Component Building Options")
+            self.clear_ion()
+            self.add_ion('NaCl')
+            self.driver.find_element(By.XPATH, "//*[starts-with(@onclick, 'update_nion')]").click()
+            self.nxt()
+            self.wait_text('Building Ion and Waterbox')
+            self.nxt()
+            self.wait_text('Assemble Generated Components')
+            self.nxt()
+            self.wait_text("Force Field Options")
+            self.force_field(ff)
+            self.engine(engine)
+            self.temperature(temp)
+            self.nxt()
+            self.wait_text("to continue equilibration and production simulations")
+            self.download(jobid)
+            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+        except:
+            traceback.print_exc()
+            print('Exception raised')
+            self.driver.quit()
 
 # In[102]:
 
@@ -723,48 +735,53 @@ class Membrane(MembraneProtein):
     '''
     
     def run(self, email, password, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
-        self.login(email,password)
-        self.wait_text("Protein/Membrane System")
-        self.driver.find_element(By.XPATH, '//a[@href="#"]').click()
-        #self.driver.find_element(By.ID, 'nav_title').click()
-        self.wait_text('default surface area')
-        jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
-        print(jobid)
-        self.lengthXY('ratio', size)
-        if lipids != None:
-            for lipid in lipids:
-                self.add_lipid(**lipid)
-        if naas != None:
-            for naa in naas:
-                self.add_naa(**naa)
-        if pegs != None:
-            for peg in pegs:
-                self.add_peg(**peg)
-        if glycolipids != None:
-            for glycolipid in glycolipids:
-                self.add_glycolipid(**glycolipid)        
-        self.show_system_info()
-        self.wait_text('Calculated XY System Size')
-        self.nxt()
-        self.wait_text("Component Building Options")
-        self.clear_ion()
-        self.add_ion('NaCl')
-        self.driver.find_element(By.XPATH, "//*[starts-with(@onclick, 'update_nion')]").click()
-        self.nxt()
-        self.wait_text('Building Ion and Waterbox')
-        self.nxt()
-        self.wait_text('Assemble Generated Components')
-        self.nxt()
-        self.wait_text("Force Field Options")
-        self.force_field(ff)
-        self.engine(engine)
-        self.temperature(temp)
-        self.nxt()
-        self.wait_text("Equilibration Input Notes")
-        print(f'Ready to download from retrive job id {jobid}')
-        self.download(jobid)
-        self.driver.quit()
-
+        try:
+            self.login(email,password)
+            self.wait_text("Protein/Membrane System")
+            self.driver.find_element(By.XPATH, '//a[@href="#"]').click()
+            #self.driver.find_element(By.ID, 'nav_title').click()
+            self.wait_text('default surface area')
+            jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
+            print(jobid)
+            self.lengthXY('ratio', size)
+            if lipids != None:
+                for lipid in lipids:
+                    self.add_lipid(**lipid)
+            if naas != None:
+                for naa in naas:
+                    self.add_naa(**naa)
+            if pegs != None:
+                for peg in pegs:
+                    self.add_peg(**peg)
+            if glycolipids != None:
+                for glycolipid in glycolipids:
+                    self.add_glycolipid(**glycolipid)        
+            self.show_system_info()
+            self.wait_text('Calculated XY System Size')
+            self.nxt()
+            self.wait_text("Component Building Options")
+            self.clear_ion()
+            self.add_ion('NaCl')
+            self.driver.find_element(By.XPATH, "//*[starts-with(@onclick, 'update_nion')]").click()
+            self.nxt()
+            self.wait_text('Building Ion and Waterbox')
+            self.nxt()
+            self.wait_text('Assemble Generated Components')
+            self.nxt()
+            self.wait_text("Force Field Options")
+            self.force_field(ff)
+            self.engine(engine)
+            self.temperature(temp)
+            self.nxt()
+            self.wait_text("Equilibration Input Notes")
+            print(f'Ready to download from retrive job id {jobid}')
+            self.download(jobid)
+            self.driver.quit()
+            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+        except:
+            traceback.print_exc()
+            print('Exception raised')
+            self.driver.quit()
 
 # In[98]:
 
@@ -778,6 +795,7 @@ def main(system_type):
         Membrane(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     else:
         print('System type must be specified')
+    
 
 def create_arg_parser():
     parser = argparse.ArgumentParser(add_help=False)
