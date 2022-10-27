@@ -1,0 +1,21 @@
+system_type:
+  system_type: SP
+system_info:
+  headless: true
+  system: solution 
+  path_out:  /home/au555720/charmm_auto/charmmgui/ 
+details:
+  preserve: 
+    option: yes
+  chains:
+  - - PROA
+    - first
+    - ACE
+  email: 201605043@post.au.dk 
+  engine: gmx
+  ff: c36m
+  pdb_id: 1L58 
+  ions: NaCl
+  password: 6KNzBsY37wQc 
+  path: /home/au555720/charmm_auto/charmmgui/Example_input_yaml/
+  temp: 310

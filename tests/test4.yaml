@@ -1,0 +1,31 @@
+system_type:
+  system_type: M
+system_info:
+  headless: true 
+  system: membrane
+  path_out:  /home/au555720/charmm_auto/charmmgui/ 
+details:
+  lengthZ:
+    option: null
+  lipids:
+  -
+    lipid: chl1
+    upper: 1
+    lower: 1
+  -
+    lipid: popc
+    upper: 10
+    lower: 10
+  naas:
+  -
+    lipid: LAU
+    aa: GLY
+    cter: CTER
+    lower: 1
+    upper: 1
+  email: 201605043@post.au.dk 
+  engine: gmx
+  ff: c36m
+  ions: NaCl
+  password: 6KNzBsY37wQc 
+  temp: 310

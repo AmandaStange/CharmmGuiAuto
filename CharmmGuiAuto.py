@@ -429,9 +429,11 @@ class SolutionProtein(CharmmGuiAuto):
             self.driver.quit()
             print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
         except:
-            traceback.print_exc()
+            #traceback.print_exc()
             print('Exception raised')
             self.driver.quit()
+            raise ValueError('A very specific bad thing happened.')
+            #raise
 
 
 # In[101]:
