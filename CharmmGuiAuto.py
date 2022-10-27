@@ -20,7 +20,7 @@ import traceback
 
 
 class CharmmGuiAuto:
-    def __init__(self, headless, system, path_out):
+    def __init__(self, headless, system, path_out, con=True):
         '''
         head = True or False, for True the browser window is not visible for the user
         system = membrane or solution
@@ -28,21 +28,25 @@ class CharmmGuiAuto:
         global out_tmp
         letters = string.ascii_letters
         self.path_out = path_out
-        out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
-        print(out_tmp)
-        options = webdriver.FirefoxOptions();
-        options.set_preference("browser.download.folderList", 2)
-        options.set_preference("browser.download.manager.showWhenStarting", False)
-        options.set_preference("browser.download.dir", out_tmp)
-        options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
-        options.set_preference("browser.download.improvements_to_download_panel", True);
-        options.set_preference("browser.download.manager.closeWhenDone", True)
-        options.headless = headless
-        self.driver = webdriver.Firefox(options=options)
-        if system == 'membrane':
-            self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
+        if not os.path.isdir(self.path_out):
+            #print(f"output path {self.path_out} doesn't exist")
+            raise ValueError(f"output path {self.path_out} doesn't exist")
         else:
-            self.driver.get('https://charmm-gui.org/?doc=input/solution')
+            out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
+            print(out_tmp)
+            options = webdriver.FirefoxOptions();
+            options.set_preference("browser.download.folderList", 2)
+            options.set_preference("browser.download.manager.showWhenStarting", False)
+            options.set_preference("browser.download.dir", out_tmp)
+            options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
+            options.set_preference("browser.download.improvements_to_download_panel", True);
+            options.set_preference("browser.download.manager.closeWhenDone", True)
+            options.headless = headless
+            self.driver = webdriver.Firefox(options=options)
+            if system == 'membrane':
+                self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
+            else:
+                self.driver.get('https://charmm-gui.org/?doc=input/solution')
     
     def nxt(self):
         self.driver.find_element(By.ID, 'nextBtn').click()
@@ -306,7 +310,7 @@ class CharmmGuiAuto:
             if dis != 10.0:
                 edge = self.driver.find_element(By.XPATH, '//*[@id="fitedge"]')
                 edge.clear()
-                edge.send_keys(dis)
+                edge.send_keys(str(dis))
         
     def ion_method(self, method=None):
         '''
@@ -364,7 +368,6 @@ class CharmmGuiAuto:
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
-        #os.system(f'rm -r {out_tmp}')
         
         time.sleep(10)
         os.system(f'tar -xf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
@@ -430,10 +433,10 @@ class SolutionProtein(CharmmGuiAuto):
             print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
         except:
             #traceback.print_exc()
-            print('Exception raised')
-            self.driver.quit()
-            raise ValueError('A very specific bad thing happened.')
-            #raise
+            #print('Exception raised')
+            #self.driver.quit()
+            #raise ValueError('A very specific bad thing happened.')
+            raise
 
 
 # In[101]:
