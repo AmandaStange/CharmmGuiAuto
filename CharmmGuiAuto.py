@@ -20,7 +20,7 @@ import traceback
 
 
 class CharmmGuiAuto:
-    def __init__(self, headless, system, path_out, con=True):
+    def __init__(self, headless, system, path_out):
         '''
         head = True or False, for True the browser window is not visible for the user
         system = membrane or solution
@@ -28,25 +28,21 @@ class CharmmGuiAuto:
         global out_tmp
         letters = string.ascii_letters
         self.path_out = path_out
-        if not os.path.isdir(self.path_out):
-            #print(f"output path {self.path_out} doesn't exist")
-            raise ValueError(f"output path {self.path_out} doesn't exist")
+        out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
+        print(out_tmp)
+        options = webdriver.FirefoxOptions();
+        options.set_preference("browser.download.folderList", 2)
+        options.set_preference("browser.download.manager.showWhenStarting", False)
+        options.set_preference("browser.download.dir", out_tmp)
+        options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
+        options.set_preference("browser.download.improvements_to_download_panel", True);
+        options.set_preference("browser.download.manager.closeWhenDone", True)
+        options.headless = headless
+        self.driver = webdriver.Firefox(options=options)
+        if system == 'membrane':
+            self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
         else:
-            out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
-            print(out_tmp)
-            options = webdriver.FirefoxOptions();
-            options.set_preference("browser.download.folderList", 2)
-            options.set_preference("browser.download.manager.showWhenStarting", False)
-            options.set_preference("browser.download.dir", out_tmp)
-            options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
-            options.set_preference("browser.download.improvements_to_download_panel", True);
-            options.set_preference("browser.download.manager.closeWhenDone", True)
-            options.headless = headless
-            self.driver = webdriver.Firefox(options=options)
-            if system == 'membrane':
-                self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
-            else:
-                self.driver.get('https://charmm-gui.org/?doc=input/solution')
+            self.driver.get('https://charmm-gui.org/?doc=input/solution')
     
     def nxt(self):
         self.driver.find_element(By.ID, 'nextBtn').click()
@@ -110,6 +106,20 @@ class CharmmGuiAuto:
             Select(self.driver.find_element(By.ID, f'mutation_chain_{resid}')).select_by_value(chain)
             Select(self.driver.find_element(By.ID, f'mutation_rid_{resid}')).select_by_value(rid)
             Select(self.driver.find_element(By.ID, f'mutation_patch_{resid}')).select_by_value(aa)
+
+    def system_pH(self, pH):
+        if pH == None:
+            self.driver.find_element(By.ID, 'ph_checked').click()
+        else:
+            t = self.driver.find_element(By.ID, 'system_pH')
+            t.clear()
+            t.send_keys(pH)
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[1]/input[3]').click()
+            
+            # t = self.driver.find_element(By.NAME, 'temperature')
+            # t.clear()
+            # t.send_keys(temp)
+
 
     def add_protonation(self, chain, res_i, rid, res_p):
         if chain is None:
@@ -310,7 +320,7 @@ class CharmmGuiAuto:
             if dis != 10.0:
                 edge = self.driver.find_element(By.XPATH, '//*[@id="fitedge"]')
                 edge.clear()
-                edge.send_keys(str(dis))
+                edge.send_keys(dis)
         
     def ion_method(self, method=None):
         '''
@@ -368,6 +378,7 @@ class CharmmGuiAuto:
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
+        #os.system(f'rm -r {out_tmp}')
         
         time.sleep(10)
         os.system(f'tar -xf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
@@ -376,7 +387,7 @@ class CharmmGuiAuto:
 
 
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
         try:
             self.login(email,password)
             self.wait_text("Protein Solution System")
@@ -393,6 +404,8 @@ class SolutionProtein(CharmmGuiAuto):
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
                     
+
+            self.system_pH(pH)      
             self.preserve(**preserve) # option
             if mutations != None:
                 for mutation in mutations:
@@ -433,10 +446,10 @@ class SolutionProtein(CharmmGuiAuto):
             print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
         except:
             #traceback.print_exc()
-            #print('Exception raised')
-            #self.driver.quit()
-            #raise ValueError('A very specific bad thing happened.')
-            raise
+            print('Exception raised')
+            self.driver.quit()
+            raise ValueError('A very specific bad thing happened.')
+            #raise
 
 
 # In[101]:
@@ -648,7 +661,7 @@ class MembraneProtein(CharmmGuiAuto):
         
         
 
-    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
         try:
             self.login(email,password)
             self.wait_text("Protein/Membrane System")
@@ -664,7 +677,7 @@ class MembraneProtein(CharmmGuiAuto):
             if chains != None:
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
-
+            self.system_pH(pH) 
             self.preserve(**preserve) # option
             if mutations != None:
                 for mutation in mutations:
