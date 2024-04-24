@@ -416,7 +416,11 @@ class CharmmGuiAuto:
 
 
 class SolutionProtein(CharmmGuiAuto):
+<<<<<<< HEAD
     def run(self, email, password, path=None, file_name = None, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
+=======
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
+>>>>>>> 3924795e0caa8776c9eed552fc7c703ecc3742e2
         try:
             self.login(email,password)
             self.wait_text("Protein Solution System")
@@ -434,8 +438,12 @@ class SolutionProtein(CharmmGuiAuto):
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
                     
+<<<<<<< HEAD
             if het != None:
                 self.read_het(het)
+=======
+
+>>>>>>> 3924795e0caa8776c9eed552fc7c703ecc3742e2
             self.system_pH(pH)      
             self.preserve(**preserve) # option
             if mutations != None:
@@ -693,7 +701,11 @@ class MembraneProtein(CharmmGuiAuto):
         
         
 
+<<<<<<< HEAD
     def run(self, email, password, path=None, file_name = None, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+=======
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+>>>>>>> 3924795e0caa8776c9eed552fc7c703ecc3742e2
         try:
             self.login(email,password)
             self.wait_text("Protein/Membrane System")
@@ -710,8 +722,11 @@ class MembraneProtein(CharmmGuiAuto):
             if chains != None:
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
+<<<<<<< HEAD
             if het != None:
                 self.read_het(het)
+=======
+>>>>>>> 3924795e0caa8776c9eed552fc7c703ecc3742e2
             self.system_pH(pH) 
             self.preserve(**preserve) # option
             if mutations != None:
