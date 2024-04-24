@@ -19,8 +19,6 @@ import string
 import traceback
 
 
-## TEST VS CODE SYNC
-
 class CharmmGuiAuto:
     def __init__(self, headless, system, path_out):
         '''
