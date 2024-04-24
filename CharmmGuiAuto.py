@@ -87,11 +87,40 @@ class CharmmGuiAuto:
             print('window has been closed')
             self.driver.quit()
 
+    def model_select(self, option=None):
+        if option is None:
+            pass
+        else:
+            for i in range(4, 4 + int(option)):
+                self.driver.find_element(By.XPATH, f'/html/body/div[4]/div[2]/div[3]/div[2]/form/div/table/tbody/tr[{i}]/td[1]/input').click()
+
     def preserve(self, option=None):
         if option is None:
             pass
         else:
             self.driver.find_element(By.ID, 'hbuild_checked').click()
+
+    def read_het(self, het):
+        if het == 'CO3':
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
+            main_window = self.driver.window_handles[0]
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[4]').click()
+            popup = self.driver.window_handles[-1]
+            self.driver.switch_to.window(popup)
+            time.sleep(10)
+            self.driver.find_element(By.ID, 'resi_sele').click()
+            self.nxt()
+            self.driver.switch_to.window(main_window)
+        # self.driver.find_element(By.ID, 'gpi_checked').click()
+        # Select(self.driver.find_element(By.ID, 'gpi_chain')).select_by_value(f'{chain}')
+        # main_window = self.driver.window_handles[0]
+        # self.driver.find_element(By.XPATH, '//*[@id="gpi"]/td[4]/input').click()
+        # popup = self.driver.window_handles[-1]
+        # self.driver.switch_to.window(popup)
+        # time.sleep(2)
+        # self.GRS_reader(GRS, skip=skip)
+        # self.nxt()
+        # self.driver.switch_to.window(main_window)
             
     def add_mutation(self, chain, rid, aa):
         if chain == None:
@@ -106,6 +135,20 @@ class CharmmGuiAuto:
             Select(self.driver.find_element(By.ID, f'mutation_chain_{resid}')).select_by_value(chain)
             Select(self.driver.find_element(By.ID, f'mutation_rid_{resid}')).select_by_value(rid)
             Select(self.driver.find_element(By.ID, f'mutation_patch_{resid}')).select_by_value(aa)
+
+    def system_pH(self, pH):
+        if pH == None:
+            self.driver.find_element(By.ID, 'ph_checked').click()
+        else:
+            t = self.driver.find_element(By.ID, 'system_pH')
+            t.clear()
+            t.send_keys(pH)
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[1]/input[3]').click()
+            
+            # t = self.driver.find_element(By.NAME, 'temperature')
+            # t.clear()
+            # t.send_keys(temp)
+
 
     def add_protonation(self, chain, res_i, rid, res_p):
         if chain is None:
@@ -373,7 +416,7 @@ class CharmmGuiAuto:
 
 
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
         try:
             self.login(email,password)
             self.wait_text("Protein Solution System")
@@ -384,12 +427,16 @@ class SolutionProtein(CharmmGuiAuto):
             self.wait_text("Model/Chain Selection Option")
             jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
             print(jobid)
+            self.model_select(model)
             self.nxt()
             self.wait_text("PDB Manipulation Options")
             if chains != None:
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
                     
+            if het != None:
+                self.read_het(het)
+            self.system_pH(pH)      
             self.preserve(**preserve) # option
             if mutations != None:
                 for mutation in mutations:
@@ -423,6 +470,7 @@ class SolutionProtein(CharmmGuiAuto):
             self.engine(engine)
             self.temperature(temp)
             self.nxt()
+            #self.wait_text("to continue equilibration and production simulations")
             self.wait_text("to continue equilibration and production simulations")
             print(f'Ready to download from retrive job id {jobid}')
             self.download(jobid)
@@ -645,7 +693,7 @@ class MembraneProtein(CharmmGuiAuto):
         
         
 
-    def run(self, email, password, path=None, file_name = None, pdb_id = None, chains = None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name = None, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
         try:
             self.login(email,password)
             self.wait_text("Protein/Membrane System")
@@ -656,12 +704,15 @@ class MembraneProtein(CharmmGuiAuto):
             self.wait_text("Model/Chain Selection Option")
             jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
             print(jobid)
+            self.model_select(model)
             self.nxt()
             self.wait_text("PDB Manipulation Options")
             if chains != None:
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
-
+            if het != None:
+                self.read_het(het)
+            self.system_pH(pH) 
             self.preserve(**preserve) # option
             if mutations != None:
                 for mutation in mutations:
@@ -720,7 +771,8 @@ class MembraneProtein(CharmmGuiAuto):
             self.engine(engine)
             self.temperature(temp)
             self.nxt()
-            self.wait_text("to continue equilibration and production simulations")
+            #self.wait_text("to continue equilibration and production simulations")
+            self.wait_text("Equilibration Input Notes")
             self.download(jobid)
             print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
         except:
