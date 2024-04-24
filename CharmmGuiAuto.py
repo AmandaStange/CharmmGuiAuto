@@ -403,7 +403,9 @@ class CharmmGuiAuto:
     def download(self, jobid):
         os.system(f'mkdir {out_tmp}')
         print('starting download')
-        self.driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
+        #/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a
+        #self.driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
+        self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a').click()
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
@@ -471,7 +473,7 @@ class SolutionProtein(CharmmGuiAuto):
             self.temperature(temp)
             self.nxt()
             #self.wait_text("to continue equilibration and production simulations")
-            self.wait_text("to continue equilibration and production simulations")
+            self.wait_text("Equilibration Input Notes")
             print(f'Ready to download from retrive job id {jobid}')
             self.download(jobid)
             self.driver.quit()
