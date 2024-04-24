@@ -1,0 +1,36 @@
+system_type:
+  system_type: MP
+system_info:
+  headless: false 
+  system: membrane
+  path_out: /home/au555720/charmm_auto/charmmgui/LASSE
+details:
+  model: 2
+  het: 'CO3'
+  preserve: 
+    option: yes
+  chains:
+  - - PROA
+    - first
+    - ACE
+  - - PROA
+    - last
+    - CT3
+  lengthZ:
+    option: null
+  size: 200
+  lipids:
+  -
+    lipid: popc
+    upper: 1
+    lower: 1
+  orientation:
+    option: PPM
+  email: 201605043@post.au.dk 
+  engine: gmx
+  ff: c36m
+  file_name: SLC4A7_with_Na_and_CO3.pdb 
+  ions: NaCl
+  password: 6KNzBsY37wQc 
+  path: /home/au555720/charmm_auto/charmmgui/LASSE/
+  temp: 310
