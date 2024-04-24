@@ -1,9 +1,9 @@
 system_type:
   system_type: MP
 system_info:
-  headless: true 
+  headless: false
   system: membrane
-  path_out:  /home/au555720/charmm_auto/charmmgui/ 
+  path_out: /home/au555720/erda-home/charmm_auto/charmmgui 
 details:
   preserve: 
     option: yes
@@ -40,5 +40,5 @@ details:
   file_name: ins_trans.pdb
   ions: NaCl
   password: 6KNzBsY37wQc 
-  path: /home/au555720/charmm_auto/charmmgui/Example_input_yaml/
+  path: /home/au555720/erda-home/charmm_auto/charmmgui/Example_input_yaml/
   temp: 310

@@ -1,0 +1,22 @@
+{'system_type': {'system_type': 'SP'}, 'system_info': {'headless': True, 'system': 'solution', 'path_out': '/home/au555720/charmm_auto/charmmgui/'}, 'details': {'preserve': {'option': True}, 'chains': [['PROA', 'first', 'ACE']], 'email': '201605043@post.au.dk', 'engine': 'gmx', 'ff': 'c36m', 'pdb_id': '1L58', 'ions': 'NaCl', 'password': '6KNzBsY37wQc', 'path': '/home/au555720/charmm_auto/charmmgui/Example_input_yaml/', 'temp': 310}}
+/home/au555720/charmm_auto/charmmgui/OHXlooEbiq
+Waiting for: Protein Solution System
+Found it!
+Waiting for: Model/Chain Selection Option
+Found it!
+JOB ID: 6678495357
+Waiting for: PDB Manipulation Options
+Found it!
+Waiting for: Add Ions
+Found it!
+Waiting for: Periodic Boundary Condition Options
+Found it!
+Waiting for: Force Field Options
+Found it!
+Waiting for: to continue equilibration and production simulations
+Found it!
+Ready to download from retrive job id JOB ID: 6678495357
+starting download
+Download done - unpacking starting
+Unpacked
+Job done - output under "charmm-gui-6678495357"
