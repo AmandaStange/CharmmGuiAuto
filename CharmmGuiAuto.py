@@ -45,24 +45,39 @@ class CharmmGuiAuto:
             self.driver.get('https://charmm-gui.org/?doc=input/solution')
     
     def nxt(self):
+        '''
+        Function to press the 'Next' button
+        '''
         self.driver.find_element(By.ID, 'nextBtn').click()
     
     def login(self, email, password):
+        '''
+        Function that sends you email and login to the login box
+        '''
         self.driver.find_element(By.NAME, 'email').send_keys(email)
         self.driver.find_element(By.NAME, 'password').send_keys(password)
         self.driver.find_element(By.CLASS_NAME, 'loginbox').submit()
         
     def upload(self, file_name, path):
+        '''
+        Function to upload local PDB files
+        '''
         choose_file = self.driver.find_element(By.NAME, 'file')
         file_location = os.path.join(path, file_name)
         choose_file.send_keys(file_location)
         self.driver.find_element(By.ID, 'nav_title').click()
 
     def from_pdb(self, pdb_id):
+        '''
+        Function to send the PDB ID if Charmm-Gui has to fetch the file
+        '''
         self.driver.find_element(By.NAME, 'pdb_id').send_keys(pdb_id)
         self.driver.find_element(By.ID, 'nav_title').click()
         
     def wait_text(self,text,start_time=None):
+        '''
+        Fuction that waits until the text present on the next page is visible
+        '''
         try:
             self.driver.window_handles
             if start_time == None:
@@ -88,6 +103,9 @@ class CharmmGuiAuto:
             self.driver.quit()
 
     def model_select(self, option=None):
+        '''
+        Function that can select non-protein chains in the model selections section
+        '''
         if option is None:
             pass
         else:
@@ -95,34 +113,34 @@ class CharmmGuiAuto:
                 self.driver.find_element(By.XPATH, f'/html/body/div[4]/div[2]/div[3]/div[2]/form/div/table/tbody/tr[{i}]/td[1]/input').click()
 
     def preserve(self, option=None):
+        '''
+        Fuction that check off the preserve hydrogen option
+        '''
         if option is None:
             pass
         else:
             self.driver.find_element(By.ID, 'hbuild_checked').click()
 
     def read_het(self, het):
+        '''
+        Function that selects the parameters for non-protein chains/molecules 
+        '''
         if het == 'CO3':
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
             main_window = self.driver.window_handles[0]
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[4]').click()
             popup = self.driver.window_handles[-1]
             self.driver.switch_to.window(popup)
-            time.sleep(10)
+            time.sleep(8)
             self.driver.find_element(By.ID, 'resi_sele').click()
             self.nxt()
             self.driver.switch_to.window(main_window)
-        # self.driver.find_element(By.ID, 'gpi_checked').click()
-        # Select(self.driver.find_element(By.ID, 'gpi_chain')).select_by_value(f'{chain}')
-        # main_window = self.driver.window_handles[0]
-        # self.driver.find_element(By.XPATH, '//*[@id="gpi"]/td[4]/input').click()
-        # popup = self.driver.window_handles[-1]
-        # self.driver.switch_to.window(popup)
-        # time.sleep(2)
-        # self.GRS_reader(GRS, skip=skip)
-        # self.nxt()
-        # self.driver.switch_to.window(main_window)
+
             
     def add_mutation(self, chain, rid, aa):
+        '''
+        Function to enter mutations of residues
+        '''
         if chain == None:
             pass
         else:
@@ -137,6 +155,9 @@ class CharmmGuiAuto:
             Select(self.driver.find_element(By.ID, f'mutation_patch_{resid}')).select_by_value(aa)
 
     def system_pH(self, pH):
+        '''
+        Function to set, or turn off, the system pH settings
+        '''
         if pH == None:
             self.driver.find_element(By.ID, 'ph_checked').click()
         else:
@@ -144,13 +165,13 @@ class CharmmGuiAuto:
             t.clear()
             t.send_keys(pH)
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[1]/input[3]').click()
-            
-            # t = self.driver.find_element(By.NAME, 'temperature')
-            # t.clear()
-            # t.send_keys(temp)
+
 
 
     def add_protonation(self, chain, res_i, rid, res_p):
+        '''
+        Function to add side-chain protonations
+        '''
         if chain is None:
             return
         else:
@@ -167,6 +188,9 @@ class CharmmGuiAuto:
 
         
     def add_disulfide(self, chain1, rid1, chain2, rid2):
+        '''
+        Function to add disfulfide bonds
+        '''
         if chain1 is None:
             pass
         else:
@@ -183,6 +207,9 @@ class CharmmGuiAuto:
             Select(self.driver.find_element(By.ID, f'ssbond_resid2_{resid}')).select_by_value(rid2)
     
     def add_phosphorylation(self, chain, res_i, rid, res_p):
+        '''
+        Function to add phosphorylations to residues
+        '''
         if chain is None:
             pass
         else:
@@ -200,6 +227,9 @@ class CharmmGuiAuto:
     
     
     def sugar_options(self, sugar_id=1,link=None,ltype='B', sname='GLC'):
+        '''
+        Function parse sugar options
+        '''
         Select(self.driver.find_element(By.ID, f'seq_name_{sugar_id}')).select_by_value(sname)
         Select(self.driver.find_element(By.ID, f'seq_type_{sugar_id}')).select_by_value(ltype)
         if link != None:
@@ -208,6 +238,9 @@ class CharmmGuiAuto:
 
 
     def add_sugar(self, sid='1'):
+        '''
+        Function to add sugars 
+        '''
         self.driver.find_element(By.ID, sid).find_element(By.CLASS_NAME, 'add').click()
 
 
@@ -236,6 +269,9 @@ class CharmmGuiAuto:
     
     
     def GRS_reader(self, GRS=None, skip=1):
+        '''
+        Function to read GRS input
+        '''
         if GRS is None:
             pass
         else:
@@ -286,6 +322,9 @@ class CharmmGuiAuto:
     
     
     def add_gpi(self, GRS=None, chain=None, skip=6):
+        '''
+        Function to add GPI
+        '''
         if GRS is None:
             pass
         else:        
@@ -301,6 +340,9 @@ class CharmmGuiAuto:
             self.driver.switch_to.window(main_window)
 
     def add_glycan(self, GRS, skip=1):
+        '''
+        Function to add glycans
+        '''
         if GRS is None:
             pass
         else:  
@@ -320,6 +362,9 @@ class CharmmGuiAuto:
     
     
     def patch(self, chain=None, ter=None, ter_patch=None):
+        '''
+        Function that add terminal patches
+        '''
         if chain is None:
             pass
         else:  
