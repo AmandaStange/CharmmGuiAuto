@@ -1,64 +1,40 @@
 system_type:
-  system_type: SP
+  system_type: SP # SP for a protein in solvent system
 system_info:
   headless: false
-  system: solution
+  system: solution # solution for a solution system
   path_out: ## INSERT OUTPUT PATH ##
 details:
-  preserve: 
+  preserve: # Preserve the hydrogens in the structure
     option: yes
-  mutations:
-    - 
+  mutations: # Residue mutations
+    - # First mutation is mutating resid 2 on PROA into ALA
       chain: PROA
       rid: '2'
       aa: ALA
   protonations:
-    -
+    - # GLU4 on PROA should be protonated
       chain: PROA
       res_i: GLU
       rid: '4'
       res_p: GLUP
   disulfides:
-    -
+    - # Add a disulfide bond between CYS6 and CYS7 on chain PROA
       chain1: PROA
       rid1: '6'
       chain2: PROA
       rid2: '7'
   phosphorylations:
-    -
+    - # Add a phosporylation on TYR14
       chain: PROA 
       res_i: TYR
       rid: '14'
       res_p: TP1
-      #  gpi:
-      #    GRS: '1 PI-DAG-DS
-      #
-      #      2 - 16A: AGLCN
-      #
-      #      3 - - 14A: AMAN
-      #
-      #      4 - - - 16A: AMAN
-      #
-      #      5 - - - - 12A: AMAN_6PEA
-      #      
-      #      6 - - - - - 11B: BGAL_1SUF'
-      #    chain: PROA
-      #  glycans:
-      #    -
-      #      GRS: '1 PROA-THR8
-      #
-      #        2 - 12B: BGLC
-      #
-      #        3 - - 14B: BGLC
-      #
-      #        4 - - - 13B: AGAL
-      #
-      #        5 - - - - 13B: BGALNA_3SUF'
   chains:
-  - - PROB
+  - - PROB # Add an ACE terminal patch on the N-terminal of chain PROB
     - first
     - ACE
-  - - PROB
+  - - PROB # Add a CT3 terminal patch on the C-terminal of chain PROB
     - last
     - CT3
   email: ## INSERT YOUR EMAIL FOR CHARMM-GUI HERE ##
@@ -70,4 +46,4 @@ details:
   path: ## INSERT THE PATH TO INS_TRANS.PDB HERE ##
   temp: 310
   waterbox:
-    dis: 15.0
+    dis: 15.0 # Set the size of the box such that there is a minimum distance of 15 Å between the box and the protein

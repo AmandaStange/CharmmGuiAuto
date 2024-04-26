@@ -1,16 +1,16 @@
 system_type:
-  system_type: M
+  system_type: M   # M for a membrane only system
 system_info:
-  headless: false
-  system: membrane
+  headless: false  #false meaning that the firefox window will be visible
+  system: membrane # membrane for a membrane system
   path_out: ## INSERT YOUR OUTPUT PATH HERE ##
 details:
   boxtype:
-    option: null
+    option: null # Standard box type
   email: ## INSERT YOUR EMAIL TO CHARMM-GUI HERE ##
-  engine: gmx
-  ff: c36m
-  glycolipids:
+  engine: gmx # Topology and run files should be in gromacs format
+  ff: c36m # The desired force field
+  glycolipids: # Format for adding glycolipids
   - GRS: '1 CER160
 
       2 - 1B: BGLC
