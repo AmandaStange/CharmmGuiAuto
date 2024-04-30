@@ -494,7 +494,7 @@ class Retrieve(CharmmGuiAuto):
             os.system(f'rm -r {out_tmp}')
             print('Unpacked')
             self.driver.quit()
-            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid}\"')
+            print(f'Job done - output under \"{self.path_out}/charmm-gui-{jobid}\"')
         except:
             #traceback.print_exc()
             print('Exception raised')
@@ -504,7 +504,7 @@ class Retrieve(CharmmGuiAuto):
 
 
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
+    def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
         try:
             self.login(email,password)
             self.wait_text("Protein Solution System")
@@ -598,7 +598,6 @@ class MembraneProtein(CharmmGuiAuto):
         self.driver.find_elements(By.NAME, 'align_option')[o].click()
 
         if o == 2:
-
             for j,point in enumerate([first_point, second_point]):
                 self.driver.find_element(By.ID, f'align[{j}][segid]').clear()
                 self.driver.find_element(By.ID, f'align[{j}][segid]').send_keys(point[0])
