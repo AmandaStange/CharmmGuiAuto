@@ -20,7 +20,7 @@ import traceback
 
 
 class CharmmGuiAuto:
-    def __init__(self, headless, system, path_out):
+    def __init__(self, headless, system, path_out, fetch=false, jobid=None):
         '''
         head = True or False, for True the browser window is not visible for the user
         system = membrane or solution
@@ -39,10 +39,27 @@ class CharmmGuiAuto:
         options.set_preference("browser.download.manager.closeWhenDone", True)
         options.headless = headless
         self.driver = webdriver.Firefox(options=options)
-        if system == 'membrane':
-            self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
+        if fetch:
+            if system == 'membrane':
+                self.driver.get(f'https://www.charmm-gui.org/?doc=input/membrane.bilayer&step=6&project=membrane_bilayer&jobid={jobid}')
+                self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a').click()
+            elif system == 'solution':
+                self.driver.get(f'https://www.charmm-gui.org/?doc=input/solution&step=4&project=solution&jobid={jobid}')
+                self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[6]/a').click()
+            
+            while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
+                    time.sleep(10)
+            print('Download done - unpacking starting')
+            time.sleep(10)
+            os.system(f'tar -xf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
+            os.system(f'rm -r {out_tmp}')
+            print('Unpacked')
         else:
-            self.driver.get('https://charmm-gui.org/?doc=input/solution')
+            if system == 'membrane':
+                self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
+            elif system == 'solution':
+                self.driver.get('https://charmm-gui.org/?doc=input/solution')
+
     
     def nxt(self):
         '''
@@ -445,12 +462,15 @@ class CharmmGuiAuto:
             t.clear()
             t.send_keys(temp)
             
-    def download(self, jobid):
+    def download(self, system, jobid):
         os.system(f'mkdir {out_tmp}')
         print('starting download')
         #/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a
         #self.driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
-        self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a').click()
+        if system == 'membrane':
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a').click()
+        elif system == 'solution':
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[6]/a').click()
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
@@ -519,7 +539,7 @@ class SolutionProtein(CharmmGuiAuto):
             self.nxt()
             self.wait_text("to continue equilibration and production simulations")
             print(f'Ready to download from retrive job id {jobid}')
-            self.download(jobid)
+            self.download(self.system, jobid)
             self.driver.quit()
             print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
         except:
@@ -819,14 +839,12 @@ class MembraneProtein(CharmmGuiAuto):
             self.nxt()
             #self.wait_text("to continue equilibration and production simulations")
             self.wait_text("Equilibration Input Notes")
-            self.download(jobid)
+            self.download(self.system, jobid)
             print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
         except:
             traceback.print_exc()
             print('Exception raised')
             self.driver.quit()
-
-# In[102]:
 
 
 class Membrane(MembraneProtein):
@@ -882,9 +900,6 @@ class Membrane(MembraneProtein):
             traceback.print_exc()
             print('Exception raised')
             self.driver.quit()
-
-# In[98]:
-
 
 def main(system_type):
     if system_type == 'SP':
