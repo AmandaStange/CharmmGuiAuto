@@ -178,9 +178,9 @@ class CharmmGuiAuto:
         if chain is None:
             return
         else:
-            if not self.driver.find_element(By.ID, 'id_prot').is_displayed():
-                self.driver.find_element(By.ID, 'prot_checked').click()
-                self.driver.find_element(By.XPATH, '//*[@id="id_prot_table"]/tr[2]/td[5]/input').click()
+            if not self.driver.find_element(By.ID, 'id_prot').is_displayed():                           
+                self.driver.find_element(By.ID, 'prot_checked').click()                                 
+                #self.driver.find_element(By.XPATH, '//*[@id="id_prot_table"]/tbody/tr[2]/td[5]/input').click()
             self.driver.find_element(By.XPATH, '//input[@value="Add Protonation"]').click()
             resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"prot_chain_")]') if i.is_displayed()]
             resid = resids[-1][-1]
@@ -448,14 +448,12 @@ class CharmmGuiAuto:
             t.clear()
             t.send_keys(temp)
             
-    def download(self, system, jobid):
+    def download(self, jobid):
         os.system(f'mkdir {out_tmp}')
         print('starting download')
-        #/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a
-        #self.driver.find_element(By.XPATH, '//*[@id="input"]/a').click()
-        if system == 'membrane':
+        try:
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a').click()
-        elif system == 'solution':
+        except:
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[6]/a').click()
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
@@ -463,7 +461,7 @@ class CharmmGuiAuto:
         #os.system(f'rm -r {out_tmp}')
         
         time.sleep(10)
-        os.system(f'tar -xf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
+        os.system(f'tar -xf {out_tmp}/charmm-gui.tgz -C {self.path_out}/') #charmm-gui.tgz
         os.system(f'rm -r {out_tmp}')
         print('Unpacked')
 
@@ -563,12 +561,12 @@ class SolutionProtein(CharmmGuiAuto):
             self.wait_text("to continue equilibration and production simulations")
             if download_now:
                 print(f'Ready to download from retrive job id {jobid}')
-                self.download(self.system, jobid)
+                self.download(jobid)
                 self.driver.quit()
                 print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
             else:
                 self.driver.quit()
-                print(f'Job done, but has not been retrieved"')
+                print(f'Job done, but has not been retrieved (JOBID: {jobid.split(" ")[-1]})')
         except:
             #traceback.print_exc()
             print('Exception raised')
@@ -868,12 +866,12 @@ class MembraneProtein(CharmmGuiAuto):
             self.wait_text("Equilibration Input Notes")
             if download_now:
                 print(f'Ready to download from retrive job id {jobid}')
-                self.download(self.system, jobid)
+                self.download(jobid)
                 self.driver.quit()
                 print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
             else:
                 self.driver.quit()
-                print(f'Job done, but has not been retrieved"')
+                print(f'Job done, but has not been retrieved (JOBID: {jobid.split(" ")[-1]})')
         except:
             traceback.print_exc()
             print('Exception raised')
