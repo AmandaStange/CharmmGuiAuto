@@ -20,7 +20,7 @@ import traceback
 
 
 class CharmmGuiAuto:
-    def __init__(self, headless, system, path_out, fetch=false, jobid=None):
+    def __init__(self, headless, system, path_out):
         '''
         head = True or False, for True the browser window is not visible for the user
         system = membrane or solution
@@ -39,26 +39,12 @@ class CharmmGuiAuto:
         options.set_preference("browser.download.manager.closeWhenDone", True)
         options.headless = headless
         self.driver = webdriver.Firefox(options=options)
-        if fetch:
-            if system == 'membrane':
-                self.driver.get(f'https://www.charmm-gui.org/?doc=input/membrane.bilayer&step=6&project=membrane_bilayer&jobid={jobid}')
-                self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a').click()
-            elif system == 'solution':
-                self.driver.get(f'https://www.charmm-gui.org/?doc=input/solution&step=4&project=solution&jobid={jobid}')
-                self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[6]/a').click()
-            
-            while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
-                    time.sleep(10)
-            print('Download done - unpacking starting')
-            time.sleep(10)
-            os.system(f'tar -xf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
-            os.system(f'rm -r {out_tmp}')
-            print('Unpacked')
-        else:
-            if system == 'membrane':
-                self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
-            elif system == 'solution':
-                self.driver.get('https://charmm-gui.org/?doc=input/solution')
+        if system == 'membrane':
+            self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
+        elif system == 'solution':
+            self.driver.get('https://charmm-gui.org/?doc=input/solution')
+        elif system == 'retrieve':
+            self.driver.get('https://www.charmm-gui.org/?doc=input/retriever')
 
     
     def nxt(self):
@@ -480,6 +466,43 @@ class CharmmGuiAuto:
         os.system(f'tar -xf {out_tmp}/charmm-gui.tgz') #charmm-gui.tgz
         os.system(f'rm -r {out_tmp}')
         print('Unpacked')
+
+
+
+class Retrieve(CharmmGuiAuto):
+    def run(self, email, password, jobid):
+        try:
+            self.login(email,password)
+            time.sleep(2)
+            self.wait_text('enter your Job ID')
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/form/input[1]').send_keys(jobid)
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/form/input[2]').click()
+            self.wait_text("Job found")
+            if 'membrane.bilayer' in self.driver.page_source:
+                self.driver.get(f'https://www.charmm-gui.org/?doc=input/membrane.bilayer&step=6&project=membrane_bilayer&jobid={jobid}')
+                # self.wait_text("Job found")
+                self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a').click()
+            else:
+                self.driver.get(f'https://www.charmm-gui.org/?doc=input/solution&step=4&project=solution&jobid={jobid}')
+                # self.wait_text("Job found")
+                self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[6]/a').click()
+
+            while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
+                    time.sleep(10)
+
+            print('Download done - unpacking starting')
+            time.sleep(10)
+            os.system(f'tar -xf {out_tmp}/charmm-gui.tgz -C {self.path_out}/') #charmm-gui.tgz
+            os.system(f'rm -r {out_tmp}')
+            print('Unpacked')
+            self.driver.quit()
+            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid}\"')
+        except:
+            #traceback.print_exc()
+            print('Exception raised')
+            self.driver.quit()
+            raise ValueError('A very specific bad thing happened.')
+            #raise
 
 
 class SolutionProtein(CharmmGuiAuto):
@@ -908,6 +931,8 @@ def main(system_type):
         MembraneProtein(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'M':
         Membrane(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+    elif system_type == 'R':
+        Retrieve(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     else:
         print('System type must be specified')
     
