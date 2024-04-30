@@ -506,7 +506,7 @@ class Retrieve(CharmmGuiAuto):
 
 
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name = None, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
+    def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 15.0}, ion_method=None):
         try:
             self.login(email,password)
             self.wait_text("Protein Solution System")
@@ -561,10 +561,14 @@ class SolutionProtein(CharmmGuiAuto):
             self.temperature(temp)
             self.nxt()
             self.wait_text("to continue equilibration and production simulations")
-            print(f'Ready to download from retrive job id {jobid}')
-            self.download(self.system, jobid)
-            self.driver.quit()
-            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            if download_now:
+                print(f'Ready to download from retrive job id {jobid}')
+                self.download(self.system, jobid)
+                self.driver.quit()
+                print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            else:
+                self.driver.quit()
+                print(f'Job done, but has not been retrieved"')
         except:
             #traceback.print_exc()
             print('Exception raised')
@@ -782,7 +786,7 @@ class MembraneProtein(CharmmGuiAuto):
         
         
 
-    def run(self, email, password, path=None, file_name = None, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
         try:
             self.login(email,password)
             self.wait_text("Protein/Membrane System")
@@ -862,8 +866,14 @@ class MembraneProtein(CharmmGuiAuto):
             self.nxt()
             #self.wait_text("to continue equilibration and production simulations")
             self.wait_text("Equilibration Input Notes")
-            self.download(self.system, jobid)
-            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            if download_now:
+                print(f'Ready to download from retrive job id {jobid}')
+                self.download(self.system, jobid)
+                self.driver.quit()
+                print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            else:
+                self.driver.quit()
+                print(f'Job done, but has not been retrieved"')
         except:
             traceback.print_exc()
             print('Exception raised')

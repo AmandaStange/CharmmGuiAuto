@@ -5,6 +5,7 @@ system_info:
   system: membrane #Membrane system
   path_out: /home/au555720/charmm_auto/charmmgui/LASSE #Replace with the path that you want the charmm-gui.tgz to be downloaded to
 details:
+  download_now: False
   model: 2 # Add the two Hetero chains
   het: 'CO3' # Specify that the hetero chain is CO3
   preserve: 
