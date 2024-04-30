@@ -11,8 +11,9 @@ required packages:
 COMMENTS/Issues:
 - Only works with firefox
 - Can be used with 'Solution Builder' with a protein, and the 'Membrane Builder' with or without a protein.
-- Can not be used on retrieved jobs (only if you modify it yourself which you are welcome to do)
-- (For protein only uploads work not PDB ID.) FIXED
+- Can not be used to continue retrieved jobs, but can download jobs that are finished, but not downloaded, if you have the jobid.
+- The protonation option is currently broken! 
+
 
 Firefox binary (firefox_binary.cpython-37.pyc - possible original path 'miniconda3/lib/python3.7/site-packages/selenium/webdriver/firefox/__pycache__/firefox_binary.cpython-37.pyc') must be placed in the bin of your environment.
 
