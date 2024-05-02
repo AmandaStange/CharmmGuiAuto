@@ -135,10 +135,22 @@ class CharmmGuiAuto:
             popup = self.driver.window_handles[-1]
             self.driver.switch_to.window(popup)
             time.sleep(8)
-            self.driver.find_element(By.ID, 'resi_sele').click()
+            #self.driver.find_element(By.Value, 'resi_sele').click()
+            self.driver.find_element(By.XPATH, "//input[@value='CO3']").click()
             self.nxt()
             self.driver.switch_to.window(main_window)
-
+        elif het == 'CO31':
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
+            main_window = self.driver.window_handles[0]
+            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[4]').click()
+            popup = self.driver.window_handles[-1]
+            self.driver.switch_to.window(popup)
+            time.sleep(8)
+            #self.driver.find_element(By.Value, 'resi_sele').click()
+            self.driver.find_element(By.XPATH, "//input[@value='CO31']").click()
+            self.nxt()
+            self.driver.switch_to.window(main_window)
+# <input type="radio" name="resi_sele" id="resi_sele" value="CO3" onclick="updateSele('CO3');">
             
     def add_mutation(self, chain, rid, aa):
         '''

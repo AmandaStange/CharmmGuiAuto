@@ -1,0 +1,37 @@
+system_type:
+  system_type: MP  #Membrane Protein system type
+system_info:
+  headless: false #Show the firefox window
+  system: membrane #Membrane system
+  path_out: /home/au555720/charmm_auto/charmmgui/LASSE #Replace with the path that you want the charmm-gui.tgz to be downloaded to
+details:
+  download_now: False
+  model: 2 # Add the two Hetero chains
+  het: 'CO31' # Specify that the hetero chain is CO3
+  preserve: 
+    option: yes # Preserve hydrogen atoms
+  chains: #Adding terminal patches 
+  - - PROA
+    - first
+    - ACE
+  - - PROA
+    - last
+    - CT3
+  lengthZ:
+    option: null #length of system
+  size: 200 #Membrane X/Y size
+  lipids: #Which lipids to use
+  -
+    lipid: popc
+    upper: 1
+    lower: 1
+  orientation: #Orientation of protein in membrane
+    option: PPM
+  email: EMAIL #Put you email for your charmm-gui user here
+  engine: gmx
+  ff: c36m #Which FF
+  file_name: SLC4A7_with_Na_and_CO3.pdb #Name of you input PDB
+  ions: NaCl #IONS (default concentration of .15 M)
+  password: PASSWORD #Your password
+  path: /home/au555720/charmm_auto/charmmgui/LASSE/ #Path to your input PDB
+  temp: 310
