@@ -3,12 +3,12 @@
 outfile='log'
 > "$outfile"
 
-path=tests
+path=LASSE
 
 sleep 1
 
 for i in {1..4}; do
-    python -u  CharmmGuiAuto.py -i ${path}/test${i}_noR.yaml  >>$outfile 2>&1 &
+    python -u  CharmmGuiAuto.py -i ${path}/${i}.yaml  >>$outfile 2>&1 &
 done
 
 obids_outfile='jobids.txt'
