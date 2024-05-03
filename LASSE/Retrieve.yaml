@@ -1,10 +1,10 @@
 system_type:
   system_type: R
 system_info:
-  headless: false
+  headless: true 
   system: retrieve 
   path_out: ## PATH TO UNPACK ## 
 details:
   email: ## EMAIL ## 
-  jobid: ## JOBID ## 
+  jobid: JOBID  
   password: ## PASSWORD 

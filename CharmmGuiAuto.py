@@ -107,7 +107,8 @@ class CharmmGuiAuto:
 
     def model_select(self, option=None):
         '''
-        Function that can select non-protein chains in the model selections section
+        Function that can select non-protein chains in the model selections section. A simple loop. The option is the number of "unselected" chains
+        
         '''
         if option is None:
             pass
@@ -127,6 +128,10 @@ class CharmmGuiAuto:
     def read_het(self, het):
         '''
         Function that selects the parameters for non-protein chains/molecules 
+
+        Current options:
+        - CO3: IONIZED CARBONATE, ADM JR., AUG 2001
+        - CO31: CHO3, BICARBONATE, XXWY & KEVO
         '''
         if het == 'CO3':
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
@@ -578,7 +583,7 @@ class SolutionProtein(CharmmGuiAuto):
                 print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
             else:
                 self.driver.quit()
-                print(f'Job done, but has not been retrieved (JOBID: {jobid.split(" ")[-1]})')
+                print(f'Job done, but has not been retrieved JOBID: {jobid.split(" ")[-1]}')
         except:
             #traceback.print_exc()
             print('Exception raised')
@@ -882,7 +887,7 @@ class MembraneProtein(CharmmGuiAuto):
                 print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
             else:
                 self.driver.quit()
-                print(f'Job done, but has not been retrieved (JOBID: {jobid.split(" ")[-1]})')
+                print(f'Job done, but has not been retrieved - JOBID: {jobid.split(" ")[-1]}')
         except:
             traceback.print_exc()
             print('Exception raised')
@@ -894,7 +899,7 @@ class Membrane(MembraneProtein):
     find lipid names https://www.charmm-gui.org/?doc=archive&lib=lipid (file name is the same as lipid name)
     '''
     
-    def run(self, email, password, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+    def run(self, email, password, download_now = True, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
         try:
             self.login(email,password)
             self.wait_text("Protein/Membrane System")
@@ -934,10 +939,14 @@ class Membrane(MembraneProtein):
             self.temperature(temp)
             self.nxt()
             self.wait_text("Equilibration Input Notes")
-            print(f'Ready to download from retrive job id {jobid}')
-            self.download(jobid)
-            self.driver.quit()
-            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            if download_now:
+                print(f'Ready to download from retrive job id {jobid}')
+                self.download(jobid)
+                self.driver.quit()
+                print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            else:
+                self.driver.quit()
+                print(f'Job done, but has not been retrieved - JOBID: {jobid.split(" ")[-1]}')
         except:
             traceback.print_exc()
             print('Exception raised')
