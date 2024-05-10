@@ -17,7 +17,7 @@ import argparse
 import random
 import string
 import traceback
-
+import subprocess
 
 class CharmmGuiAuto:
     def __init__(self, headless, system, path_out):
@@ -475,10 +475,22 @@ class CharmmGuiAuto:
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
-        #os.system(f'rm -r {out_tmp}')
+        
         
         time.sleep(10)
-        os.system(f'tar -xf {out_tmp}/charmm-gui.tgz -C {self.path_out}/') #charmm-gui.tgz
+        #os.system(f'tar -xf {out_tmp}/charmm-gui.tgz -C {self.path_out}/') #charmm-gui.tgz
+        unpacked = True
+        while unpacked:
+            try:
+                # Attempt to unpack the tar file
+                subprocess.run(['tar', '-xf', f'{out_tmp}/charmm-gui.tgz', '-C', f'{self.path_out}/'], check=True)
+                # print("Unpacking succeeded")
+                unpacked = False
+                break
+            except subprocess.CalledProcessError as e:
+                # If tar command fails, print the error and retry after some time
+                # print(f"Failed to unpack, retrying {e.stderr}")
+                time.sleep(5)  # Wait for 5 seconds before retrying
         os.system(f'rm -r {out_tmp}')
         print('Unpacked')
 
@@ -507,7 +519,18 @@ class Retrieve(CharmmGuiAuto):
 
             print('Download done - unpacking starting')
             time.sleep(10)
-            os.system(f'tar -xf {out_tmp}/charmm-gui.tgz -C {self.path_out}/') #charmm-gui.tgz
+            unpacked = True
+            while unpacked:
+                try:
+                    # Attempt to unpack the tar file
+                    subprocess.run(['tar', '-xf', f'{out_tmp}/charmm-gui.tgz', '-C', f'{self.path_out}/'], check=True)
+                    # print("Unpacking succeeded")
+                    unpacked = False
+                    break
+                except subprocess.CalledProcessError as e:
+                    # If tar command fails, print the error and retry after some time
+                    # print(f"Failed to unpack, retrying {e.stderr}")
+                    time.sleep(5)  # Wait for 5 seconds before retrying
             os.system(f'rm -r {out_tmp}')
             print('Unpacked')
             self.driver.quit()
