@@ -19,7 +19,7 @@ CHARMM-GUI is a powerful tool for preparing complex molecular systems for simula
 
 ## Features
 
-- Automates the generation of input files for CHARMM-GUI.
+- Automates the generation of MD input files using CHARMM-GUI.
 - Simplifies the preparation of molecular dynamics simulations.
 - Provides a set of example YAML files for easy customization.
 - Integrates seamlessly with CHARMM-GUI web interface.
