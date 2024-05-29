@@ -1,0 +1,55 @@
+system_type:
+  system_type: M   # M for a membrane only system
+system_info:
+  headless: false  #false meaning that the firefox window will be visible
+  system: membrane # membrane for a membrane system
+  path_out: ## INSERT YOUR OUTPUT PATH HERE ##
+details:
+  boxtype:
+    option: null # Standard box type
+  email: ## INSERT YOUR EMAIL TO CHARMM-GUI HERE ##
+  engine: gmx # Topology and run files should be in gromacs format
+  ff: c36m # The desired force field
+  glycolipids: # Format for adding glycolipids
+  - GRS: '1 CER160
+
+      2 - 1B: BGLC
+
+      3 - - 14B: BGAL
+
+      4 - - - 13B: BGLCNA
+
+      5 - - - - 13B: BGAL
+
+      6 - - - - - 13A: AGAL
+
+      7 - - - - - 12A: AFUC
+
+      '
+    lower: 1
+    upper: 1
+  ions: NaCl
+  lengthZ:
+    option: null
+  lipids:
+  - - chl1
+    - 1
+    - 1
+  - - popc
+    - 10
+    - 10
+  naas:
+  - - LAU
+    - GLY
+    - CTER
+    - 1
+    - 1
+  password: ## INSERT YOUR PASSWORD FOR CHARMM-GUI HERE ##
+  pegs:
+  - - DAG
+    - DLGL
+    - 5
+    - 1
+    - 1
+  size: 100
+  temp: 310
