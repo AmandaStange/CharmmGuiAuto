@@ -1,0 +1,4 @@
+selenium
+geckodriver
+yaml
+argparse
