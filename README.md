@@ -43,7 +43,7 @@ Here is a basic example of how to use CharmmGuiAuto:
 2. Run the script with your YAML file as input.
 
 ```sh
-python CharmmGuiAuto.py -i Example_input_yaml/new_example.yaml
+python CharmmGuiAuto.py -i Example_input_yaml/MembraneProtein.yaml
 ```
 
 ## Example Input Files
