@@ -546,6 +546,10 @@ class PDBReader(CharmmGuiAuto):
     def run(self):
         return True
 
+class FFConverter(CharmmGuiAuto):
+    def run(self):
+        return True
+
 class SolutionProtein(CharmmGuiAuto):
     def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
         try:
