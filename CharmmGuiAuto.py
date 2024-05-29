@@ -46,13 +46,13 @@ class CharmmGuiAuto:
         elif system == 'retrieve':
             self.driver.get('https://www.charmm-gui.org/?doc=input/retriever')
 
-    
+
     def nxt(self):
         '''
         Function to press the 'Next' button
         '''
         self.driver.find_element(By.ID, 'nextBtn').click()
-    
+
     def login(self, email, password):
         '''
         Function that sends you email and login to the login box
@@ -60,7 +60,7 @@ class CharmmGuiAuto:
         self.driver.find_element(By.NAME, 'email').send_keys(email)
         self.driver.find_element(By.NAME, 'password').send_keys(password)
         self.driver.find_element(By.CLASS_NAME, 'loginbox').submit()
-        
+
     def upload(self, file_name, path):
         '''
         Function to upload local PDB files
@@ -76,7 +76,7 @@ class CharmmGuiAuto:
         '''
         self.driver.find_element(By.NAME, 'pdb_id').send_keys(pdb_id)
         self.driver.find_element(By.ID, 'nav_title').click()
-        
+
     def wait_text(self,text,start_time=None):
         '''
         Fuction that waits until the text present on the next page is visible
@@ -108,7 +108,7 @@ class CharmmGuiAuto:
     def model_select(self, option=None):
         '''
         Function that can select non-protein chains in the model selections section. A simple loop. The option is the number of "unselected" chains
-        
+
         '''
         if option is None:
             pass
@@ -127,7 +127,7 @@ class CharmmGuiAuto:
 
     def read_het(self, het):
         '''
-        Function that selects the parameters for non-protein chains/molecules 
+        Function that selects the parameters for non-protein chains/molecules
 
         Current options:
         - CO3: IONIZED CARBONATE, ADM JR., AUG 2001
@@ -156,7 +156,7 @@ class CharmmGuiAuto:
             self.nxt()
             self.driver.switch_to.window(main_window)
 # <input type="radio" name="resi_sele" id="resi_sele" value="CO3" onclick="updateSele('CO3');">
-            
+
     def add_mutation(self, chain, rid, aa):
         '''
         Function to enter mutations of residues
@@ -195,8 +195,8 @@ class CharmmGuiAuto:
         if chain is None:
             return
         else:
-            if not self.driver.find_element(By.ID, 'id_prot').is_displayed():                           
-                self.driver.find_element(By.ID, 'prot_checked').click()                                 
+            if not self.driver.find_element(By.ID, 'id_prot').is_displayed():
+                self.driver.find_element(By.ID, 'prot_checked').click()
                 #self.driver.find_element(By.XPATH, '//*[@id="id_prot_table"]/tbody/tr[2]/td[5]/input').click()
             self.driver.find_element(By.XPATH, '//input[@value="Add Protonation"]').click()
             resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"prot_chain_")]') if i.is_displayed()]
@@ -206,7 +206,7 @@ class CharmmGuiAuto:
             Select(self.driver.find_element(By.ID, f'prot_rid_{resid}')).select_by_value(rid)
             Select(self.driver.find_element(By.ID, f'prot_patch_{resid}')).select_by_value(res_p)
 
-        
+
     def add_disulfide(self, chain1, rid1, chain2, rid2):
         '''
         Function to add disfulfide bonds
@@ -225,7 +225,7 @@ class CharmmGuiAuto:
             Select(self.driver.find_element(By.ID, f'ssbond_resid1_{resid}')).select_by_value(rid1)
             Select(self.driver.find_element(By.ID, f'ssbond_chain2_{resid}')).select_by_value(chain2)
             Select(self.driver.find_element(By.ID, f'ssbond_resid2_{resid}')).select_by_value(rid2)
-    
+
     def add_phosphorylation(self, chain, res_i, rid, res_p):
         '''
         Function to add phosphorylations to residues
@@ -244,8 +244,8 @@ class CharmmGuiAuto:
             Select(self.driver.find_element(By.ID, f'phos_rid_{resid}')).select_by_value(rid)
             Select(self.driver.find_element(By.ID, f'phos_patch_{resid}')).select_by_value(res_p)
 
-    
-    
+
+
     def sugar_options(self, sugar_id=1,link=None,ltype='B', sname='GLC'):
         '''
         Function parse sugar options
@@ -259,7 +259,7 @@ class CharmmGuiAuto:
 
     def add_sugar(self, sid='1'):
         '''
-        Function to add sugars 
+        Function to add sugars
         '''
         self.driver.find_element(By.ID, sid).find_element(By.CLASS_NAME, 'add').click()
 
@@ -286,8 +286,8 @@ class CharmmGuiAuto:
         Select(self.driver.find_element(By.ID, f'chem_resid_{resid}')).select_by_value(str(sugar_id))
         Select(self.driver.find_element(By.ID, f'chem_site_{resid}')).select_by_value(mod[0])
         Select(self.driver.find_element(By.ID, f'chem_patch_{resid}')).select_by_value(mod[1:])
-    
-    
+
+
     def GRS_reader(self, GRS=None, skip=1):
         '''
         Function to read GRS input
@@ -306,7 +306,7 @@ class CharmmGuiAuto:
                         sug = sug[:-1] + sug[-1].split('_')
                     else:
                         sug += [None]
-                    sugars_dict[int(sug[0])] = {'sname': sug[-2][1:], 'sugar_id': int(sug[0])-1, 'ltype': sug[-2][0], 'mod': sug[-1]} 
+                    sugars_dict[int(sug[0])] = {'sname': sug[-2][1:], 'sugar_id': int(sug[0])-1, 'ltype': sug[-2][0], 'mod': sug[-1]}
                     if  sugars_dict[int(sug[0])]['sugar_id'] != 1:
                         sugars_dict[int(sug[0])]['link'] =  sug[-3][1]
                         if len(sug) > 1:
@@ -338,16 +338,16 @@ class CharmmGuiAuto:
                     self.add_sugar(sugars_dict[i]['branch'])
                     self.sugar_options(sugar_id = sugars_dict[i]['sugar_id'], link = sugars_dict[i].get('link', None), ltype = sugars_dict[i]['ltype'], sname =sugars_dict[i]['sname'])
                     self.add_modification(sname= sugars_dict[i]['sname'], sugar_id = sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
-    
-    
-    
+
+
+
     def add_gpi(self, GRS=None, chain=None, skip=6):
         '''
         Function to add GPI
         '''
         if GRS is None:
             pass
-        else:        
+        else:
             self.driver.find_element(By.ID, 'gpi_checked').click()
             Select(self.driver.find_element(By.ID, 'gpi_chain')).select_by_value(f'{chain}')
             main_window = self.driver.window_handles[0]
@@ -365,7 +365,7 @@ class CharmmGuiAuto:
         '''
         if GRS is None:
             pass
-        else:  
+        else:
             if not self.driver.find_element(By.ID, 'add_glycosylation').is_displayed():
                 self.driver.find_element(By.ID, 'glyc_checked').click()
             self.driver.find_element(By.ID, 'add_glycosylation').click()
@@ -379,15 +379,15 @@ class CharmmGuiAuto:
             self.GRS_reader(GRS, skip=skip)
             self.nxt()
             self.driver.switch_to.window(main_window)
-    
-    
+
+
     def patch(self, chain=None, ter=None, ter_patch=None):
         '''
         Function that add terminal patches
         '''
         if chain is None:
             pass
-        else:  
+        else:
             Select(self.driver.find_element(By.NAME, f'terminal[{chain}][{ter}]')).select_by_value(f'{ter_patch}')
 
     def waterbox(self, size='implicit', shape = 'rect', dis=10.0, X=10.0, Y=10.0, Z=10.0):
@@ -415,7 +415,7 @@ class CharmmGuiAuto:
                 edge = self.driver.find_element(By.XPATH, '//*[@id="fitedge"]')
                 edge.clear()
                 edge.send_keys(dis)
-        
+
     def ion_method(self, method=None):
         '''
         method = 'mc' or 'dist'
@@ -440,21 +440,21 @@ class CharmmGuiAuto:
             c.send_keys(conc)
         if not neu:
             self.driver.find_element(By.XPATH, '//*[@id="ions_table"]/tbody/tr[1]/td[5]/input').click()
-    
+
     def calc_solv(self):
         self.driver.find_element(By.XPATH, '//*[@id="fsolution"]/div[6]/input').click()
-        
+
     def force_field(self, ff):
         '''
         ff = 'c36m', 'c36', 'amber' or 'opls'
         '''
         Select(self.driver.find_element(By.NAME, 'fftype')).select_by_value(ff)
 
-    
+
     def engine(self,software):
         '''
-        software = 'namd'(NAMD), 'gmx'(GROMACS), 'amb'(AMBER), 'omm'(OpenMM), 
-                    'comm'(CHARMM/OpenMM), 'gns'(GENESIS), 'dms'(Desmond), 
+        software = 'namd'(NAMD), 'gmx'(GROMACS), 'amb'(AMBER), 'omm'(OpenMM),
+                    'comm'(CHARMM/OpenMM), 'gns'(GENESIS), 'dms'(Desmond),
                     'lammps', or 'tinker'
         '''
         self.driver.find_element(By.XPATH, f'//*[@id="input_{software}"]/td/input').click()
@@ -464,7 +464,7 @@ class CharmmGuiAuto:
             t = self.driver.find_element(By.NAME, 'temperature')
             t.clear()
             t.send_keys(temp)
-            
+
     def download(self, jobid):
         os.system(f'mkdir {out_tmp}')
         print('starting download')
@@ -475,8 +475,8 @@ class CharmmGuiAuto:
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
-        
-        
+
+
         time.sleep(10)
         #os.system(f'tar -xf {out_tmp}/charmm-gui.tgz -C {self.path_out}/') #charmm-gui.tgz
         unpacked = True
@@ -542,6 +542,9 @@ class Retrieve(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
             #raise
 
+class PDBReader(CharmmGuiAuto):
+    def run(self):
+        return True
 
 class SolutionProtein(CharmmGuiAuto):
     def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
@@ -561,14 +564,14 @@ class SolutionProtein(CharmmGuiAuto):
             if chains != None:
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
-                    
+
             if het != None:
                 self.read_het(het)
-            self.system_pH(pH)      
+            self.system_pH(pH)
             self.preserve(**preserve) # option
             if mutations != None:
                 for mutation in mutations:
-                    self.add_mutation(**mutation) # chain, rid, aa 
+                    self.add_mutation(**mutation) # chain, rid, aa
             if protonations != None:
                 for protonation in protonations:
                     self.add_protonation(**protonation) #chain,res_i,rid,res_p
@@ -582,7 +585,7 @@ class SolutionProtein(CharmmGuiAuto):
             if glycans != None:
                 for glycan in glycans:
                     self.add_glycan(**glycan, skip=1) # GRS,skip=1
-            
+
             self.nxt()
             self.wait_text("Add Ions")
             self.waterbox(**waterbox)
@@ -674,8 +677,8 @@ class MembraneProtein(CharmmGuiAuto):
         if option != 'rot':
             self.driver.find_elements(By.NAME, 'filltype')[1].click()
             self.driver.find_element(By.NAME, 'crad').send_keys(radius)
-            
-            
+
+
     def projection(self, option=None):
         '''
         option: upper or lower
@@ -712,7 +715,7 @@ class MembraneProtein(CharmmGuiAuto):
         '''
         if option == None:
             return
-        options = {'ratio':'hetero_lx', 'nlipid':'hetero_xvsy'} 
+        options = {'ratio':'hetero_lx', 'nlipid':'hetero_xvsy'}
         if option == 'nlipid':
             self.driver.find_elements(By.NAME, 'hetero_xy_option')[1].click()
         self.driver.find_element(By.NAME, options[option]).clear()
@@ -735,8 +738,8 @@ class MembraneProtein(CharmmGuiAuto):
 
     def show_system_info(self):
         self.driver.find_element(By.ID,'hetero_size_button').click()
-        time.sleep(1)        
-    
+        time.sleep(1)
+
     def add_naa(self, lipid='LAU', aa='GLY', cter='CTER', lower=1,upper=1):
         prevs = [i.get_attribute('value') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "NAA")]')]
         if len(prevs) != 0:
@@ -762,7 +765,7 @@ class MembraneProtein(CharmmGuiAuto):
         l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][naa{new_l}]')
         l.clear()
         l.send_keys(lower)
-        
+
     def add_peg(self, lipid='DAG', tail='DLGL', units=5, lower=1,upper=1):
         prevs = [i.get_attribute('value') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "PEG")]')]
         if len(prevs) != 0:
@@ -791,9 +794,9 @@ class MembraneProtein(CharmmGuiAuto):
         l.clear()
         l.send_keys(lower)
 
-        
-        
-    
+
+
+
 
     def add_glycolipid(self, GRS, upper=1, lower=1):
         prevs = [i.get_attribute('value') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "GLP")]')]
@@ -820,8 +823,8 @@ class MembraneProtein(CharmmGuiAuto):
         l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][glp{new_l}]')
         l.clear()
         l.send_keys(lower)
-        
-        
+
+
 
     def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, orientation = 'PDB', position = {'option': None}, area = {'option': None}, projection =  {'option': None}, boxtype= {'option': None}, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
         try:
@@ -842,11 +845,11 @@ class MembraneProtein(CharmmGuiAuto):
                     self.patch(chain[0], chain[1], chain[2])
             if het != None:
                 self.read_het(het)
-            self.system_pH(pH) 
+            self.system_pH(pH)
             self.preserve(**preserve) # option
             if mutations != None:
                 for mutation in mutations:
-                    self.add_mutation(**mutation) # chain, rid, aa 
+                    self.add_mutation(**mutation) # chain, rid, aa
             if protonations != None:
                 for protonation in protonations:
                     self.add_protonation(**protonation) #chain,res_i,rid,res_p
@@ -860,7 +863,7 @@ class MembraneProtein(CharmmGuiAuto):
             if glycans != None:
                 for glycan in glycans:
                     self.add_glycan(**glycan, skip=1) # GRS,skip=1
-                    
+
             self.nxt()
             self.wait_text("Area Calculation Options")
             self.orientation(**orientation)
@@ -921,7 +924,7 @@ class Membrane(MembraneProtein):
     '''
     find lipid names https://www.charmm-gui.org/?doc=archive&lib=lipid (file name is the same as lipid name)
     '''
-    
+
     def run(self, email, password, download_now = True, boxtype=None, lengthZ=None, lipids = None, naas = None, pegs = None, glycolipids = None, size = 100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
         try:
             self.login(email,password)
@@ -943,7 +946,7 @@ class Membrane(MembraneProtein):
                     self.add_peg(**peg)
             if glycolipids != None:
                 for glycolipid in glycolipids:
-                    self.add_glycolipid(**glycolipid)        
+                    self.add_glycolipid(**glycolipid)
             self.show_system_info()
             self.wait_text('Calculated XY System Size')
             self.nxt()
@@ -986,14 +989,14 @@ def main(system_type):
         Retrieve(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     else:
         print('System type must be specified')
-    
+
 
 def create_arg_parser():
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('-h', '--help', action='help', default=argparse.SUPPRESS,
                     help='Script to automate CharmmGui process.')
     parser.add_argument('-i', '--input', help='Input yaml name', default='input.yaml')
-    
+
     return parser
 
 if __name__ == "__main__":
