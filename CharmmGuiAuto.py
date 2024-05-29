@@ -508,12 +508,12 @@ class CharmmGuiAuto:
 
 
     def manipulate_PDB(self, path=None, file_name=None, pdb_id=None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None):
-        
+
         if file_name is not None:
             self.upload(file_name, path)
         else:
             self.from_pdb(pdb_id)
-        
+
         self.wait_text("Model/Chain Selection Option")
         jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
         print(jobid)
