@@ -1,4 +1,4 @@
+python
 selenium
 geckodriver
-yaml
-argparse
+pyyaml
