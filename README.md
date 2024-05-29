@@ -10,6 +10,7 @@ CharmmGuiAuto is a tool designed to automate interactions with CHARMM-GUI, a web
 - [Installation](#installation)
 - [Usage](#usage)
 - [Example Input Files](#example-input-files)
+- [Know Issues](#known-issues)
 - [License](#license)
 
 ## Introduction
@@ -48,6 +49,14 @@ python CharmmGuiAuto.py -i Example_input_yaml/new_example.yaml
 ## Example Input Files
 
 The `Example_input_yaml` directory contains sample YAML files that demonstrate how to configure various simulations. You can customize these files to fit your specific needs.
+
+
+## Known Issues
+- Only works with firefox
+- Can be used with 'Solution Builder' with a protein, and the 'Membrane Builder' with or without a protein.
+- Can not be used to continue retrieved jobs, but can download jobs that are finished, but not downloaded, if you   have the jobid.
+
+Firefox binary (firefox_binary.cpython-37.pyc - possible original path 'miniconda3/lib/python3.7/site-packages/     selenium/webdriver/firefox/__pycache__/firefox_binary.cpython-37.pyc') must be placed in the bin of your            environment.
 
 
 ## License
