@@ -494,6 +494,44 @@ class CharmmGuiAuto:
         os.system(f'rm -r {out_tmp}')
         print('Unpacked')
 
+    def manipulate_PDB(self, path=None, file_name=None, pdb_id=None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None):
+        if file_name is not None:
+            self.upload(file_name, path)
+        else:
+            self.from_pdb(pdb_id)
+        self.wait_text("Model/Chain Selection Option")
+        jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
+        print(jobid)
+        self.model_select(model)
+        self.nxt()
+        self.wait_text("PDB Manipulation Options")
+        if chains != None:
+            for chain in chains:
+                self.patch(chain[0], chain[1], chain[2])
+
+        if het != None:
+            self.read_het(het)
+        self.system_pH(pH)
+        self.preserve(**preserve) # option
+        if mutations != None:
+            for mutation in mutations:
+                self.add_mutation(**mutation) # chain, rid, aa
+        if protonations != None:
+            for protonation in protonations:
+                self.add_protonation(**protonation) #chain,res_i,rid,res_p
+        if disulfides != None:
+            for disulfide in disulfides:
+                self.add_disulfide(**disulfide) #chain1, rid1, chain2, rid2
+        if phosphorylations != None:
+            for phosphorylation in phosphorylations:
+                self.add_phosphorylation(**phosphorylation) #chain,res_i,rid_res_p
+        self.add_gpi(**gpi, skip=6) #GRS,chain,skip=6
+        if glycans != None:
+            for glycan in glycans:
+                self.add_glycan(**glycan, skip=1) # GRS,skip=1
+
+
+
 
 
 class Retrieve(CharmmGuiAuto):
@@ -543,6 +581,10 @@ class Retrieve(CharmmGuiAuto):
             #raise
 
 class PDBReader(CharmmGuiAuto):
+    def run(self):
+        return True
+
+class FFConverter(CharmmGuiAuto):
     def run(self):
         return True
 
