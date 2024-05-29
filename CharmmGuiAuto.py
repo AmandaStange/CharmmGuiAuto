@@ -471,7 +471,10 @@ class CharmmGuiAuto:
         try:
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[8]/a').click()
         except:
-            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[6]/a').click()
+            try:
+                self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[6]/a').click()
+            except:
+                self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[2]/div[3]/a').click()
         while not os.path.isfile(f'{out_tmp}/charmm-gui.tgz'):
             time.sleep(10)
         print('Download done - unpacking starting')
@@ -582,8 +585,23 @@ class Retrieve(CharmmGuiAuto):
             #raise
 
 class PDBReader(CharmmGuiAuto):
-    def run(self):
-        return True
+    def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None):
+        self.login(email, password)
+        self.wait_text('PDB Reader & Manipulator')
+        if file_name is not None:
+                self.upload(file_name, path)
+        else:
+            self.from_pdb(pdb_id)
+        self.manipulate_PDB(self, path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
+        self.wait_text('Computed Energy')
+        if download_now:
+            print(f'Ready to download from retrive job id {jobid}')
+            self.download(jobid)
+            self.driver.quit()
+            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+        else:
+            self.driver.quit()
+            print(f'Job done, but has not been retrieved JOBID: {jobid.split(" ")[-1]}')
 
 class FFConverter(CharmmGuiAuto):
     def run(self):
