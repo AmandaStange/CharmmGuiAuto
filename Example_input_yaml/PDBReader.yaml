@@ -1,0 +1,17 @@
+system_type:
+  system_type: PR
+system_info:
+  headless: false
+  system: reader 
+  path_out:  
+details:
+  preserve: 
+    option: yes
+  chains:
+  - - PROA
+    - first
+    - ACE
+  email: 
+  pdb_id: 1L58 
+  password: 
+  path: 

@@ -45,6 +45,8 @@ class CharmmGuiAuto:
             self.driver.get('https://charmm-gui.org/?doc=input/solution')
         elif system == 'retrieve':
             self.driver.get('https://www.charmm-gui.org/?doc=input/retriever')
+        elif system == 'reader':
+            self.driver.get('https://www.charmm-gui.org/?doc=input/pdbreader')
 
 
     def nxt(self):
@@ -68,14 +70,21 @@ class CharmmGuiAuto:
         choose_file = self.driver.find_element(By.NAME, 'file')
         file_location = os.path.join(path, file_name)
         choose_file.send_keys(file_location)
-        self.driver.find_element(By.ID, 'nav_title').click()
+        try:
+            self.driver.find_element(By.ID, 'nav_title').click()
+        except:
+            self.nxt()
 
     def from_pdb(self, pdb_id):
         '''
         Function to send the PDB ID if Charmm-Gui has to fetch the file
         '''
         self.driver.find_element(By.NAME, 'pdb_id').send_keys(pdb_id)
-        self.driver.find_element(By.ID, 'nav_title').click()
+        #/html/body/div[4]/div[2]/div[3]/span[2]/span[3]/span[3]/div[1]/form/div/input
+        try:
+            self.driver.find_element(By.ID, 'nav_title').click()
+        except:
+            self.nxt()
 
     def wait_text(self,text,start_time=None):
         '''
@@ -499,10 +508,12 @@ class CharmmGuiAuto:
 
 
     def manipulate_PDB(self, path=None, file_name=None, pdb_id=None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None):
+        
         if file_name is not None:
             self.upload(file_name, path)
         else:
             self.from_pdb(pdb_id)
+        
         self.wait_text("Model/Chain Selection Option")
         jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
         print(jobid)
@@ -533,6 +544,7 @@ class CharmmGuiAuto:
         if glycans != None:
             for glycan in glycans:
                 self.add_glycan(**glycan, skip=1) # GRS,skip=1
+        return jobid
 
 
 
@@ -588,11 +600,9 @@ class PDBReader(CharmmGuiAuto):
     def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None):
         self.login(email, password)
         self.wait_text('PDB Reader & Manipulator')
-        if file_name is not None:
-                self.upload(file_name, path)
-        else:
-            self.from_pdb(pdb_id)
-        self.manipulate_PDB(self, path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
+        time.sleep(1)
+        jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
+        self.nxt()
         self.wait_text('Computed Energy')
         if download_now:
             print(f'Ready to download from retrive job id {jobid}')
@@ -1048,6 +1058,8 @@ def main(system_type):
         Membrane(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'R':
         Retrieve(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+    elif system_type == 'PR':
+        PDBReader(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     else:
         print('System type must be specified')
 
