@@ -1464,19 +1464,19 @@ def main(system_type):
         system_type (str): Type of the system to run ('SP', 'MP', 'M', 'R', 'PR', 'FC', 'RC').
     """
     if system_type == 'SP':
-        SolutionProtein(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+        SolutionProtein(system='solution', **parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'MP':
-        MembraneProtein(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+        MembraneProtein(system='membrane', **parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'M':
-        Membrane(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+        Membrane(system='membrane', **parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'R':
-        Retrieve(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+        Retrieve(system='retrieve', **parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'PR':
-        PDBReader(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+        PDBReader(system='reader', **parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'FC':
-        FFConverter(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+        FFConverter(system='converter', **parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'RC':
-        PDBReaderFFConverter(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+        PDBReaderFFConverter(system='readerconverter', **parsed_yaml['system_info']).run(**parsed_yaml['details'])
     else:
         print('System type must be specified')
 
