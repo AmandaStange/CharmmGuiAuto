@@ -35,59 +35,59 @@ system_info:
 
 The parameters of the 'details' section can be divided into parameters concerning:
 - Universal
-    download_now (bool): Whether to download the output immediately (default is True).
+    - download_now (bool): Whether to download the output immediately (default is True).
 
 - PDB manipulation
-    pdb_id (str): PDB ID for fetching the file (optional).
-    model (any): Model selection options (optional).
-    chains (list): List of chains to be patched (optional).
-    het (str): Type of non-protein molecule (optional).
-    pH (float): Desired pH value (optional).
-    preserve (dict): Preserve hydrogen options (default is {'option': None}).
-    mutations (list): List of mutations to add (optional).
-    protonations (list): List of protonations to add (optional).
-    disulfides (list): List of disulfide bonds to add (optional).
-    phosphorylations (list): List of phosphorylations to add (optional).
-    gpi (dict): GPI anchor options (default is {'GRS': None}).
-    glycans (list): List of glycans to add (optional).
+    - pdb_id (str): PDB ID for fetching the file (optional).
+    - model (any): Model selection options (optional).
+    - chains (list): List of chains to be patched (optional).
+    - het (str): Type of non-protein molecule (optional).
+    - pH (float): Desired pH value (optional).
+    - preserve (dict): Preserve hydrogen options (default is {'option': None}).
+    - mutations (list): List of mutations to add (optional).
+    - protonations (list): List of protonations to add (optional).
+    - disulfides (list): List of disulfide bonds to add (optional).
+    - phosphorylations (list): List of phosphorylations to add (optional).
+    - gpi (dict): GPI anchor options (default is {'GRS': None}).
+    - glycans (list): List of glycans to add (optional).
 
 - Solvation
-    waterbox (dict): Waterbox configuration (default is {'dis': 10.0}).
-    ion_method (str): Ion method (optional).
+    - waterbox (dict): Waterbox configuration (default is {'dis': 10.0}).
+    - ion_method (str): Ion method (optional).
 
 - Membrane
-    boxtype (dict): Box type options (optional).
-    lengthZ (any): Length in Z direction options (optional).
-    lipids (list): List of lipids to add (optional).
-    naas (list): List of N-acylated amino acids to add (optional).
-    pegs (list): List of PEG lipids to add (optional).
-    glycolipids (list): List of glycolipids to add (optional).
-    size (int): Size of the system (default is 100).
+    - boxtype (dict): Box type options (optional).
+    - lengthZ (any): Length in Z direction options (optional).
+    - lipids (list): List of lipids to add (optional).
+    - naas (list): List of N-acylated amino acids to add (optional).
+    - pegs (list): List of PEG lipids to add (optional).
+    - glycolipids (list): List of glycolipids to add (optional).
+    - size (int): Size of the system (default is 100).
 
 - Membrane protein
-    orientation (str): Orientation option (default is 'PDB').
-    position (dict): Position options (default is {'option': None}).
-    area (dict): Area options (default is {'option': None}).
-    projection (dict): Projection options (default is {'option': None}).
+    - orientation (str): Orientation option (default is 'PDB').
+    - position (dict): Position options (default is {'option': None}).
+    - area (dict): Area options (default is {'option': None}).
+    - projection (dict): Projection options (default is {'option': None}).
 
 - MD options
-    ff (str): Force field type (default is 'c36m').
-    engine (str): Simulation engine (default is 'gmx').
-    temp (float): Temperature in Kelvin (default is 310).
+    - ff (str): Force field type (default is 'c36m').
+    - engine (str): Simulation engine (default is 'gmx').
+    - temp (float): Temperature in Kelvin (default is 310).
 
 - Retrieval
-    jobid (str): Job ID to retrieve.
+    - jobid (str): Job ID to retrieve.
 
 - Conversion
-    path (str): Directory path where the PSF file is located (optional).
-    file_name (str): Name of the PSF file (optional).
-    PBC (bool): Whether to set up periodic boundary conditions (default is False).
-    PBC_x (float): Size of the PBC box (default is 10).
+    - path (str): Directory path where the PSF file is located (optional).
+    - file_name (str): Name of the PSF file (optional).
+    - PBC (bool): Whether to set up periodic boundary conditions (default is False).
+    - PBC_x (float): Size of the PBC box (default is 10).
 
 While this might appear overwhelming it is less so in reality as many of these can be left at their default. For the parameters that have multiple options (such as the protonations) the values should match those written in the dropdown menus of the GUI.
 
 There is an example input file for all system types with each containing comments on the parameters chosen, and if you need help with a specific setup then please just send a message.
 
-It is recommend to run ones system with headless: false, and follow along to ensure the correct options are followed.
+It is recommend to setup your first input file by clicking along in the browser of CHARMM-GUI, and adding the parameter to the file everytime you change anything from the default.
 
  
