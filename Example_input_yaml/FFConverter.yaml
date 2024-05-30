@@ -1,0 +1,10 @@
+system_type:
+  system_type: FC
+system_info:
+  headless: false
+  system: converter
+  path_out:  ## INSERT YOUR OUTPUT PATH HERE ##
+details:
+  email: ## INSERT YOUR EMAIL FOR CHARMM-GUI HERE ##
+  password: ## INSERT YOUR PASSWORD FOR CHARMM-GUI HERE ##
+  path: ## INSERT THE PATH TO THE OUT FROM PDBREADER (charmm-gui-JOBID) HERE ##

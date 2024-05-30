@@ -1,9 +1,9 @@
 system_type:
-  system_type: PR
+  system_type: RC
 system_info:
   headless: false
-  system: reader 
-  path_out:  ## INSERT YOUR OUTPUT PATH HERE ## 
+  system: readerconverter 
+  path_out:  ## INSERT YOUR OUTPUT PATH HERE ##
 details:
   preserve: 
     option: yes
@@ -15,3 +15,4 @@ details:
   password: ## INSERT YOUR PASSWORD FOR CHARMM-GUI HERE ##
   file_name: ins_trans.pdb
   path: ## INSERT THE PATH TO INS_TRANS.PDB HERE ##
+
