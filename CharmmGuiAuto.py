@@ -45,8 +45,10 @@ class CharmmGuiAuto:
             self.driver.get('https://charmm-gui.org/?doc=input/solution')
         elif system == 'retrieve':
             self.driver.get('https://www.charmm-gui.org/?doc=input/retriever')
-        elif system == 'reader':
+        elif system in ['reader', 'readerconverter']:
             self.driver.get('https://www.charmm-gui.org/?doc=input/pdbreader')
+        elif system == 'converter':
+            self.driver.get('https://www.charmm-gui.org/?doc=input/converter.ffconverter')
 
 
     def nxt(self):
@@ -453,6 +455,12 @@ class CharmmGuiAuto:
     def calc_solv(self):
         self.driver.find_element(By.XPATH, '//*[@id="fsolution"]/div[6]/input').click()
 
+    def sys_type(self, systype):
+        '''
+        systype = 'solution', 'bilayer', 'micelle' or 'nanodisc'
+        '''
+        Select(self.driver.find_element(By.NAME, 'systype')).select_by_value(systype.lower())
+    
     def force_field(self, ff):
         '''
         ff = 'c36m', 'c36', 'amber' or 'opls'
@@ -598,24 +606,137 @@ class Retrieve(CharmmGuiAuto):
 
 class PDBReader(CharmmGuiAuto):
     def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None):
-        self.login(email, password)
-        self.wait_text('PDB Reader & Manipulator')
-        time.sleep(1)
-        jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
-        self.nxt()
-        self.wait_text('Computed Energy')
-        if download_now:
-            print(f'Ready to download from retrive job id {jobid}')
-            self.download(jobid)
+        try:
+            self.login(email, password)
+            self.wait_text('PDB Reader & Manipulator')
+            time.sleep(1)
+            jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans) 
+            self.nxt()
+            self.wait_text('Computed Energy')
+            if download_now:
+                print(f'Ready to download from retrive job id {jobid}')
+                self.download(jobid)
+                self.driver.quit()
+                print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            else:
+                self.driver.quit()
+                print(f'Job done, but has not been retrieved JOBID: {jobid.split(" ")[-1]}')
+        except:
+            #traceback.print_exc()
+            print('Exception raised')
             self.driver.quit()
-            print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
-        else:
-            self.driver.quit()
-            print(f'Job done, but has not been retrieved JOBID: {jobid.split(" ")[-1]}')
+            raise ValueError('A very specific bad thing happened.')
 
 class FFConverter(CharmmGuiAuto):
-    def run(self):
-        return True
+    def run(self, email, password, path=None, file_name = None, download_now = True, PBC=False, PBC_x=10, systype = 'Solution', ff = 'c36m', engine = 'gmx', temp=310):
+        try:
+            self.login(email,password)
+            self.wait_text('Force Field Converter')
+            time.sleep(1)
+            # Upload PSF File
+            choose_file = self.driver.find_element(By.ID, 'psffile')
+            file_location = os.path.join(path, 'step1_pdbreader.psf')
+            choose_file.send_keys(file_location)
+            # Upload CRD File
+            choose_file = self.driver.find_element(By.ID, 'crdfile')
+            file_location = os.path.join(path, 'step1_pdbreader.crd')
+            choose_file.send_keys(file_location)
+            # Upload additional files
+            self.driver.find_element(By.NAME, "add_toppar").click()
+            choose_file = self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/span[2]/div[1]/form/p[2]/table/tbody/tr/td[4]/input')
+            file_location = os.path.join(path, 'step1_pdbreader.str')
+            choose_file.send_keys(file_location)
+            if PBC:
+                t = self.driver.find_element(By.NAME, 'box[cube][x]')
+                t.clear()
+                t.send_keys(PBC_x)
+            else:
+                self.driver.find_element(By.ID, 'setup_pbc').click()
+            self.nxt()            
+            self.wait_text('System Information')
+            jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
+            print(jobid)
+            self.sys_type(systype) 
+            self.force_field(ff)
+            self.engine(engine)
+            self.temperature(temp)
+            self.nxt()
+            self.wait_text("to continue equilibration and production simulations")
+            if download_now:
+                print(f'Ready to download from retrive job id {jobid}')
+                self.download(jobid)
+                self.driver.quit()
+                print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            else:
+                self.driver.quit()
+                print(f'Job done, but has not been retrieved JOBID: {jobid.split(" ")[-1]}')
+        except:
+            #traceback.print_exc()
+            print('Exception raised')
+            # self.driver.quit()
+            raise ValueError('A very specific bad thing happened.')
+
+class PDBReaderFFConverter(CharmmGuiAuto):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, PBC=False, PBC_x=10, systype='Solution', ff='c36m', engine='gmx', temp=310):
+        try:
+            self.login(email, password)
+            self.wait_text('PDB Reader & Manipulator')
+            time.sleep(1)
+            jobid1 = self.manipulate_PDB(path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans) 
+            self.nxt()
+            self.wait_text('Computed Energy')
+            print(f'Ready to download from retrive job id {jobid1}')
+            self.download(jobid1)
+            print(f'PDBReader done - output under \"{self.path_out}charmm-gui-{jobid1.split(" ")[-1]}\"')
+            path_PDBReader = f'{self.path_out}charmm-gui-{jobid1.split(" ")[-1]}'
+            #PDBReader done moving on to FFConverter
+            self.driver.get('https://www.charmm-gui.org/?doc=input/converter.ffconverter')
+            # self.login(email,password)
+            self.wait_text('Force Field Converter')
+            time.sleep(1)
+            # Upload PSF File
+            choose_file = self.driver.find_element(By.ID, 'psffile')
+            file_location = os.path.join(path_PDBReader, 'step1_pdbreader.psf')
+            choose_file.send_keys(file_location)
+            # Upload CRD File
+            choose_file = self.driver.find_element(By.ID, 'crdfile')
+            file_location = os.path.join(path_PDBReader, 'step1_pdbreader.crd')
+            choose_file.send_keys(file_location)
+            # Upload additional files
+            self.driver.find_element(By.NAME, "add_toppar").click()
+            choose_file = self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/span[2]/div[1]/form/p[2]/table/tbody/tr/td[4]/input')
+            file_location = os.path.join(path_PDBReader, 'step1_pdbreader.str')
+            choose_file.send_keys(file_location)
+            if PBC:
+                t = self.driver.find_element(By.NAME, 'box[cube][x]')
+                t.clear()
+                t.send_keys(PBC_x)
+            else:
+                self.driver.find_element(By.ID, 'setup_pbc').click()
+            self.nxt()            
+            self.wait_text('System Information')
+            jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
+            print(jobid)
+            self.sys_type(systype) 
+            self.force_field(ff)
+            self.engine(engine)
+            self.temperature(temp)
+            self.nxt()
+            self.wait_text("to continue equilibration and production simulations")
+            if download_now:
+                print(f'Ready to download from retrive job id {jobid}')
+                self.download(jobid)
+                self.driver.quit()
+                print(f'Job done - output under \"{self.path_out}charmm-gui-{jobid.split(" ")[-1]}\"')
+            else:
+                self.driver.quit()
+                print(f'Job done, but has not been retrieved JOBID: {jobid.split(" ")[-1]}')
+        except:
+            #traceback.print_exc()
+            print('Exception raised')
+            self.driver.quit()
+            raise ValueError('A very specific bad thing happened.')
+        
 
 class SolutionProtein(CharmmGuiAuto):
     def run(self, email, password, path=None, file_name = None, download_now = True, pdb_id = None, model = None, chains = None, het = None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations = None, gpi = {'GRS':None}, glycans = None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
@@ -1060,6 +1181,10 @@ def main(system_type):
         Retrieve(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     elif system_type == 'PR':
         PDBReader(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+    elif system_type == 'FC':
+        FFConverter(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
+    elif system_type == 'RC':
+        PDBReaderFFConverter(**parsed_yaml['system_info']).run(**parsed_yaml['details'])
     else:
         print('System type must be specified')
 
@@ -1080,6 +1205,5 @@ if __name__ == "__main__":
         parsed_yaml=yaml.safe_load(stream)
         print(parsed_yaml)
     main(**parsed_yaml['system_type'])
-
 
 
