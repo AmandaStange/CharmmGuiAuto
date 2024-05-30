@@ -161,7 +161,7 @@ class CharmmGuiAuto:
         Selects parameters for non-protein chains/molecules.
 
         Parameters:
-            het (str): Type of non-protein molecule ('CO3' or 'CO31').
+            het (str): Type of non-protein molecule ('CO3' for IONIZED CARBONATE, ADM JR., AUG 2001 or 'CO31' for HO3, BICARBONATE, XXWY & KEVO).
         """
         if het == 'CO3':
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
@@ -229,7 +229,7 @@ class CharmmGuiAuto:
             chain (str): Chain identifier.
             res_i (str): Initial residue.
             rid (str): Residue ID.
-            res_p (str): Protonation type.
+            res_p (str): Protonation type. (The value should be the same as in the Dropdown menu under 'Patch')
         """
         if chain is None:
             return
@@ -277,7 +277,7 @@ class CharmmGuiAuto:
             chain (str): Chain identifier.
             res_i (str): Initial residue.
             rid (str): Residue ID.
-            res_p (str): Phosphorylation type.
+            res_p (str): Phosphorylation type. (The value should be the same as in the Dropdown menu under 'Patch' ie. for TYR: [TP1, TP2], SER: [SP1, SP2], THR: [THP1, THPB], ARG: [RP1, RP2])
         """
         if chain is None:
             pass
