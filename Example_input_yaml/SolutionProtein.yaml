@@ -2,7 +2,6 @@ system_type:
   system_type: SP # SP for a protein in solvent system
 system_info:
   headless: false
-  system: solution # solution for a solution system
   path_out: ## INSERT OUTPUT PATH ##
 details:
   preserve: # Preserve the hydrogens in the structure

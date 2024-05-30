@@ -2,7 +2,6 @@ system_type:
   system_type: RC
 system_info:
   headless: false
-  system: readerconverter 
   path_out:  ## INSERT YOUR OUTPUT PATH HERE ##
 details:
   preserve: 

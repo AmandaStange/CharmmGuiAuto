@@ -2,7 +2,6 @@ system_type:
   system_type: SP
 system_info:
   headless: false
-  system: solution
   path_out: ## INSERT OUTPUT PATH ##
 details:
   preserve: 

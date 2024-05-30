@@ -2,7 +2,6 @@ system_type:
   system_type: M   # M for a membrane only system
 system_info:
   headless: false  #false meaning that the firefox window will be visible
-  system: membrane # membrane for a membrane system
   path_out: ## INSERT YOUR OUTPUT PATH HERE ##
 details:
   boxtype:
