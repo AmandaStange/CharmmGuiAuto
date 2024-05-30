@@ -48,7 +48,7 @@ python CharmmGuiAuto.py -i Example_input_yaml/MembraneProtein.yaml
 
 ## Example Input Files
 
-The `Example_input_yaml` directory contains sample YAML files that demonstrate how to configure various simulations. You can customize these files to fit your specific needs.
+The `Example_input_yaml` directory contains sample YAML files that demonstrate how to configure various simulations, and gives an overview of the different parameters that can be changed. You can customize these files to fit your specific needs.
 
 
 ## Known Issues
