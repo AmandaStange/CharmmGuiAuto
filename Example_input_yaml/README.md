@@ -38,30 +38,30 @@ The parameters of the 'details' section can be divided into parameters concernin
     - download_now (bool): Whether to download the output immediately (default is True).
 
 - PDB manipulation
-    - pdb_id (str): PDB ID for fetching the file (optional).
-    - model (any): Model selection options (optional).
-    - chains (list): List of chains to be patched (optional).
-    - het (str): Type of non-protein molecule (optional).
-    - pH (float): Desired pH value (optional).
+    - pdb_id (str): PDB ID for fetching the file 
+    - model (any): Model selection options 
+    - chains (list): List of chains to be patched 
+    - het (str): Type of non-protein molecule 
+    - pH (float): Desired pH value 
     - preserve (dict): Preserve hydrogen options (default is {'option': None}).
-    - mutations (list): List of mutations to add (optional).
-    - protonations (list): List of protonations to add (optional).
-    - disulfides (list): List of disulfide bonds to add (optional).
-    - phosphorylations (list): List of phosphorylations to add (optional).
+    - mutations (list): List of mutations to add 
+    - protonations (list): List of protonations to add 
+    - disulfides (list): List of disulfide bonds to add 
+    - phosphorylations (list): List of phosphorylations to add 
     - gpi (dict): GPI anchor options (default is {'GRS': None}).
-    - glycans (list): List of glycans to add (optional).
+    - glycans (list): List of glycans to add 
 
 - Solvation
     - waterbox (dict): Waterbox configuration (default is {'dis': 10.0}).
-    - ion_method (str): Ion method (optional).
+    - ion_method (str): Ion method 
 
 - Membrane
-    - boxtype (dict): Box type options (optional).
-    - lengthZ (any): Length in Z direction options (optional).
-    - lipids (list): List of lipids to add (optional).
-    - naas (list): List of N-acylated amino acids to add (optional).
-    - pegs (list): List of PEG lipids to add (optional).
-    - glycolipids (list): List of glycolipids to add (optional).
+    - boxtype (dict): Box type options 
+    - lengthZ (any): Length in Z direction options 
+    - lipids (list): List of lipids to add 
+    - naas (list): List of N-acylated amino acids to add 
+    - pegs (list): List of PEG lipids to add 
+    - glycolipids (list): List of glycolipids to add 
     - size (int): Size of the system (default is 100).
 
 - Membrane protein
@@ -79,8 +79,8 @@ The parameters of the 'details' section can be divided into parameters concernin
     - jobid (str): Job ID to retrieve.
 
 - Conversion
-    - path (str): Directory path where the PSF file is located (optional).
-    - file_name (str): Name of the PSF file (optional).
+    - path (str): Directory path where the PSF file is located 
+    - file_name (str): Name of the PSF file 
     - PBC (bool): Whether to set up periodic boundary conditions (default is False).
     - PBC_x (float): Size of the PBC box (default is 10).
 
