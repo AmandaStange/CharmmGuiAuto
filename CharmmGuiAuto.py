@@ -19,7 +19,7 @@ import traceback
 import subprocess
 
 class CharmmGuiAuto:
-    def __init__(self, headless, system, path_out):
+    def __init__(self, system, headless=True, path_out=None):
         """
         Initializes the CharmmGuiAuto class.
 
@@ -29,14 +29,18 @@ class CharmmGuiAuto:
             path_out (str): Path to the output directory.
         """
         global out_tmp
-        letters = string.ascii_letters
-        self.path_out = path_out
-        out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
-        print(out_tmp)
+        
         options = webdriver.FirefoxOptions();
+
+        if path_out is not None:
+            letters = string.ascii_letters
+            self.path_out = path_out
+            out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
+            print(out_tmp)
+            options.set_preference("browser.download.dir", out_tmp)
+        
         options.set_preference("browser.download.folderList", 2)
         options.set_preference("browser.download.manager.showWhenStarting", False)
-        options.set_preference("browser.download.dir", out_tmp)
         options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
         options.set_preference("browser.download.improvements_to_download_panel", True)
         options.set_preference("browser.download.manager.closeWhenDone", True)
