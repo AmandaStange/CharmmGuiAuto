@@ -2,7 +2,6 @@ system_type:
   system_type: FC
 system_info:
   headless: false
-  system: converter
   path_out:  ## INSERT YOUR OUTPUT PATH HERE ##
 details:
   email: ## INSERT YOUR EMAIL FOR CHARMM-GUI HERE ##

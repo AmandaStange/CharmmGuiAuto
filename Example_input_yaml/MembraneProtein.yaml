@@ -2,7 +2,6 @@ system_type:
   system_type: MP
 system_info:
   headless: false
-  system: membrane
   path_out: ## INSERT YOUR OUTPUT PATH HERE ##
 details:
   area:
