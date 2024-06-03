@@ -38,7 +38,9 @@ details:
     - CT3
   email: ## INSERT YOUR EMAIL FOR CHARMM-GUI HERE ##
   engine: gmx
-  ff: c36m
+  ff: amber
+  amber_options:
+    water: TIP4PEW
   file_name: ins_trans.pdb
   ions: NaCl
   password: ## INSERT YOUR PASSWORD FOR CHARMM-GUI HERE ##
