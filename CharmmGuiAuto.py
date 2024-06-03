@@ -550,14 +550,27 @@ class CharmmGuiAuto:
         """
         Select(self.driver.find_element(By.NAME, 'systype')).select_by_value(systype.lower())
 
-    def force_field(self, ff):
+    def force_field(self, ff, amber_options = None):
         """
         Sets the force field type.
 
         Parameters:
             ff (str): Force field type ('c36m', 'c36', 'amber', or 'opls').
+            amber_options: Which AMBER FF options to use ['amberff_prot': ,'amberff_dna','amberff_rna','amberff_glycan', 'amberff_lipid','amberff_water','amberff_ligand']
         """
         Select(self.driver.find_element(By.NAME, 'fftype')).select_by_value(ff)
+        if ff == 'amber':
+            amber_options_default = {'Protein': 'FF19SB','DNA': 'OL15','RNA': 'OL3','Glycan': 'GLYCAM_06j', 'Lipid': 'Lipid21','Water': 'TIP3P','Ligand': 'GAFF2'}
+            if amber_options is not None:
+                 for key, value in amber_options.items():
+                    amber_options_default[key.capitalize()] = value
+            Select(self.driver.find_element(By.ID, 'amberff_prot')).select_by_value(amber_options_default['Protein'])
+            Select(self.driver.find_element(By.ID, 'amberff_dna')).select_by_value(amber_options_default['DNA'])
+            Select(self.driver.find_element(By.ID, 'amberff_rna')).select_by_value(amber_options_default['RNA'])
+            Select(self.driver.find_element(By.ID, 'amberff_glycan')).select_by_value(amber_options_default['Glycan'])
+            Select(self.driver.find_element(By.ID, 'amberff_lipid')).select_by_value(amber_options_default['Lipid'])
+            Select(self.driver.find_element(By.ID, 'amberff_water')).select_by_value(amber_options_default['Water'])
+            Select(self.driver.find_element(By.ID, 'amberff_ligand')).select_by_value(amber_options_default['Ligand'])
 
     def engine(self, software):
         """
@@ -912,7 +925,7 @@ class PDBReaderFFConverter(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, ions='NaCl', ff='c36m', engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
         """
         Runs the Solution Protein setup and simulation.
 
@@ -988,7 +1001,7 @@ class SolutionProtein(CharmmGuiAuto):
             self.wait_text('Periodic Boundary Condition Options')
             self.nxt()
             self.wait_text("Force Field Options")
-            self.force_field(ff)
+            self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
             self.nxt()
