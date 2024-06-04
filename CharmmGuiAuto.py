@@ -774,7 +774,7 @@ class PDBReader(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class FFConverter(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, PBC=False, PBC_x=10, systype='Solution', ff='c36m', engine='gmx', temp=310):
+    def run(self, email, password, path=None, file_name=None, download_now=True, PBC=False, PBC_x=10, systype='Solution', ff='c36m', amber_options=None, engine='gmx', temp=310):
         """
         Runs the Force Field Converter.
 
@@ -788,6 +788,7 @@ class FFConverter(CharmmGuiAuto):
             PBC_x (float): Size of the PBC box (default is 10).
             systype (str): System type ('Solution', 'Bilayer', etc., default is 'Solution').
             ff (str): Force field type (default is 'c36m').
+            amber_options (dict): AMBER FF options (default is None).
             engine (str): Simulation engine (default is 'gmx').
             temp (float): Temperature in Kelvin (default is 310).
         """
@@ -819,7 +820,7 @@ class FFConverter(CharmmGuiAuto):
             jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
             print(jobid)
             self.sys_type(systype)
-            self.force_field(ff)
+            self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
             self.nxt()
@@ -838,7 +839,7 @@ class FFConverter(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class PDBReaderFFConverter(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, PBC=False, PBC_x=10, systype='Solution', ff='c36m', engine='gmx', temp=310):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, PBC=False, PBC_x=10, systype='Solution', ff='c36m', amber_options = None, engine='gmx', temp=310):
         """
         Runs both the PDB Reader and Force Field Converter.
 
@@ -864,6 +865,7 @@ class PDBReaderFFConverter(CharmmGuiAuto):
             PBC_x (float): Size of the PBC box (default is 10).
             systype (str): System type ('Solution', 'Bilayer', etc., default is 'Solution').
             ff (str): Force field type (default is 'c36m').
+            amber_options (dict): AMBER FF options (default is None).
             engine (str): Simulation engine (default is 'gmx').
             temp (float): Temperature in Kelvin (default is 310).
         """
@@ -906,7 +908,7 @@ class PDBReaderFFConverter(CharmmGuiAuto):
             jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
             print(jobid)
             self.sys_type(systype)
-            self.force_field(ff)
+            self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
             self.nxt()
@@ -949,6 +951,7 @@ class SolutionProtein(CharmmGuiAuto):
             glycans (list): List of glycans to add (optional).
             ions (str): Ion type (default is 'NaCl').
             ff (str): Force field type (default is 'c36m').
+            amber_options (dict): AMBER FF options (default is None).
             engine (str): Simulation engine (default is 'gmx').
             temp (float): Temperature in Kelvin (default is 310).
             waterbox (dict): Waterbox configuration (default is {'dis': 10.0}).
@@ -1269,7 +1272,7 @@ class MembraneProtein(CharmmGuiAuto):
         l.clear()
         l.send_keys(lower)
 
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation='PDB', position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation='PDB', position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
         """
         Runs the membrane protein setup and simulation.
 
@@ -1304,6 +1307,7 @@ class MembraneProtein(CharmmGuiAuto):
             size (int): Size of the system (default is 100).
             ions (str): Ion type (default is 'NaCl').
             ff (str): Force field type (default is 'c36m').
+            amber_options (dict): AMBER FF options (default is None).
             engine (str): Simulation engine (default is 'gmx').
             temp (float): Temperature in Kelvin (default is 310).
         """
@@ -1379,7 +1383,7 @@ class MembraneProtein(CharmmGuiAuto):
             self.wait_text('Assemble Generated Components')
             self.nxt()
             self.wait_text("Force Field Options")
-            self.force_field(ff)
+            self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
             self.nxt()
@@ -1402,7 +1406,7 @@ class Membrane(MembraneProtein):
     Membrane setup simulation.
     """
 
-    def run(self, email, password, download_now=True, boxtype=None, lengthZ=None, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', engine='gmx', temp='310'):
+    def run(self, email, password, download_now=True, boxtype=None, lengthZ=None, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options=None, engine='gmx', temp='310'):
         """
         Runs the membrane setup and simulation.
 
@@ -1419,6 +1423,7 @@ class Membrane(MembraneProtein):
             size (int): Size of the system (default is 100).
             ions (str): Ion type (default is 'NaCl').
             ff (str): Force field type (default is 'c36m').
+            amber_options (dict): AMBER FF options (default is None).
             engine (str): Simulation engine (default is 'gmx').
             temp (float): Temperature in Kelvin (default is 310).
         """
@@ -1455,7 +1460,7 @@ class Membrane(MembraneProtein):
             self.wait_text('Assemble Generated Components')
             self.nxt()
             self.wait_text("Force Field Options")
-            self.force_field(ff)
+            self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
             self.nxt()
