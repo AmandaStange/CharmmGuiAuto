@@ -29,7 +29,7 @@ class CharmmGuiAuto:
             path_out (str): Path to the output directory.
         """
         global out_tmp
-        
+
         options = webdriver.FirefoxOptions();
 
         if path_out is not None:
@@ -38,7 +38,7 @@ class CharmmGuiAuto:
             out_tmp = f'{path_out}{"".join(random.choice(letters) for i in range(10))}'
             print(out_tmp)
             options.set_preference("browser.download.dir", out_tmp)
-        
+
         options.set_preference("browser.download.folderList", 2)
         options.set_preference("browser.download.manager.showWhenStarting", False)
         options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
@@ -1272,7 +1272,7 @@ class MembraneProtein(CharmmGuiAuto):
         l.clear()
         l.send_keys(lower)
 
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation='PDB', position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
         """
         Runs the membrane protein setup and simulation.
 
