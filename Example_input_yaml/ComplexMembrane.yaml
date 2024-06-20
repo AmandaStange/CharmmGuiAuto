@@ -10,49 +10,42 @@ details:
   engine: gmx # Topology and run files should be in gromacs format
   ff: c36m # The desired force field
   glycolipids: # Format for adding glycolipids
-  - GRS: '1 CER160
-
-      2 - 1B: BGLC
-
-      3 - - 14B: BGAL
-
-      4 - - - 13B: BGLCNA
-
-      5 - - - - 13B: BGAL
-
-      6 - - - - - 13A: AGAL
-
-      7 - - - - - 12A: AFUC
-
-      '
-    lower: 1
-    upper: 1
-  ions: NaCl
-  lengthZ:
-    option: null
+  - GRS: '1 CER241'
+    upper: 35
+    lower: 0
   lipids:
-  -
+  - 
     lipid: chl1
-    upper: 1
-    lower: 1
-  -
+    upper: 134
+    lower: 130
+  - 
     lipid: popc
-    upper: 10
-    lower: 10
-  naas:
+    upper: 54
+    lower: 41
   -
-    lipid: LAU
-    aa: GLY
-    cter: CTER
-    lower: 1
-    upper: 1
+    lipid: sapc  
+    upper: 19
+    lower: 3
+  - 
+    lipid: pape
+    upper: 29
+    lower: 62
+  - 
+    lipid: psm
+    upper: 31
+    lower: 7
+  - 
+    lipid: saps
+    upper: 0
+    lower: 44
+  -
+    lipid: sapi25 
+    upper: 0
+    lower: 4
+  ions: NaCl
+  lengthXY:
+    option: ratio
+    value: 200
   password: ## INSERT YOUR PASSWORD FOR CHARMM-GUI HERE ##
-  pegs:
-  -
-    lipid: DAG
-    tail: DLGL
-    units: 5
-    lower: 1
-    upper: 1
   size: 100
   temp: 310

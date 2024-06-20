@@ -30,6 +30,8 @@ class CharmmGuiAuto:
         """
         global out_tmp
 
+        print(headless)
+
         options = webdriver.FirefoxOptions();
 
         if path_out is not None:
@@ -44,7 +46,9 @@ class CharmmGuiAuto:
         options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/gzip")
         options.set_preference("browser.download.improvements_to_download_panel", True)
         options.set_preference("browser.download.manager.closeWhenDone", True)
-        options.headless = headless
+        #options.headless = True
+        if headless == 'true':
+            options.add_argument("--headless")
         self.driver = webdriver.Firefox(options=options)
         if system == 'membrane':
             self.driver.get('https://www.charmm-gui.org/?doc=input/membrane.bilayer')
@@ -1136,9 +1140,10 @@ class MembraneProtein(CharmmGuiAuto):
             return
         options = {'ratio': 'hetero_lx', 'nlipid': 'hetero_xvsy'}
         if option == 'nlipid':
-            self.driver.find_elements(By.NAME, 'hetero_xy_option')[1].click()
-        self.driver.find_element(By.NAME, options[option]).clear()
-        self.driver.find_element(By.NAME, options[option]).send_keys(value)
+            self.driver.find_elements(By.ID, 'hetero_xy_nlipid')[0].click()
+        else:
+            self.driver.find_element(By.NAME, options[option]).clear()
+            self.driver.find_element(By.NAME, options[option]).send_keys(value)
 
     def add_lipid(self, lipid, upper, lower):
         """
@@ -1149,21 +1154,43 @@ class MembraneProtein(CharmmGuiAuto):
             upper (int): Number of lipids in the upper leaflet.
             lower (int): Number of lipids in the lower leaflet.
         """
-        buttons = self.driver.find_elements(By.XPATH, "//img[contains(@src,'tri.png')]")
-        if len(buttons) != 0:
-            [x.click() for x in buttons if x.is_displayed()]
-        u = self.driver.find_element(By.NAME, f'lipid_ratio[upper][{lipid}]')
-        u.clear()
-        u.send_keys(upper)
-        l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][{lipid}]')
-        l.clear()
-        l.send_keys(lower)
+        print(lipid)
+        try:
+            buttons = self.driver.find_elements(By.XPATH, "//img[contains(@src,'tri.png')]")
+            if len(buttons) != 0:
+                [x.click() for x in buttons if x.is_displayed()]
+            u = self.driver.find_element(By.NAME, f'lipid_ratio[upper][{lipid}]')
+            u.clear()
+            u.send_keys(upper)
+            l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][{lipid}]')
+            l.clear()
+            l.send_keys(lower)
+        except:
+            try:
+                buttons = self.driver.find_elements(By.XPATH, "//img[contains(@src,'tri.png')]")
+                if len(buttons) != 0:
+                    [x.click() for x in buttons if x.is_displayed()]
+                u = self.driver.find_element(By.NAME, f'lipid_number[upper][{lipid}]')
+                u.clear()
+                u.send_keys(upper)
+                l = self.driver.find_element(By.NAME, f'lipid_number[lower][{lipid}]')
+                l.clear()
+                l.send_keys(lower)
+            except:
+                print(lipid, upper, lower)
 
     def show_system_info(self):
         """
         Displays the system information.
         """
-        self.driver.find_element(By.ID, 'hetero_size_button').click()
+        try:
+            element = self.driver.find_element(By.ID, 'hetero_size_button') # CSS_SELECTOR  #hetero_xy_option_nlipid > p:nth-child(4) > input:nth-child(1)
+            self.driver.execute_script("arguments[0].scrollIntoView()", element)
+            element.click()
+        except:
+            element = self.driver.find_element(By.CSS_SELECTOR, '#hetero_xy_option_nlipid > p:nth-child(4) > input:nth-child(1)') ##hetero_xy_option_ratio > p:nth-child(4) > input:nth-child(1)
+            self.driver.execute_script("arguments[0].scrollIntoView()", element)
+            element.click()
         time.sleep(1)
 
     def add_naa(self, lipid='LAU', aa='GLY', cter='CTER', lower=1, upper=1):
@@ -1195,12 +1222,20 @@ class MembraneProtein(CharmmGuiAuto):
         Select(self.driver.find_element(By.ID, f'nacylaa_cter')).select_by_value(cter)
         self.nxt()
         self.driver.switch_to.window(main_window)
-        u = self.driver.find_element(By.NAME, f'lipid_ratio[upper][naa{new_l}]')
-        u.clear()
-        u.send_keys(upper)
-        l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][naa{new_l}]')
-        l.clear()
-        l.send_keys(lower)
+        try:
+            u = self.driver.find_element(By.NAME, f'lipid_ratio[upper][naa{new_l}]')
+            u.clear()
+            u.send_keys(upper)
+            l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][naa{new_l}]')
+            l.clear()
+            l.send_keys(lower)
+        except:
+            u = self.driver.find_element(By.NAME, f'lipid_number[upper][naa{new_l}]')
+            u.clear()
+            u.send_keys(upper)
+            l = self.driver.find_element(By.NAME, f'lipid_number[lower][naa{new_l}]')
+            l.clear()
+            l.send_keys(lower)
 
     def add_peg(self, lipid='DAG', tail='DLGL', units=5, lower=1, upper=1):
         """
@@ -1233,12 +1268,20 @@ class MembraneProtein(CharmmGuiAuto):
         u.send_keys(units)
         self.nxt()
         self.driver.switch_to.window(main_window)
-        u = self.driver.find_element(By.NAME, f'lipid_ratio[upper][peg{new_l}]')
-        u.clear()
-        u.send_keys(upper)
-        l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][peg{new_l}]')
-        l.clear()
-        l.send_keys(lower)
+        try:
+            u = self.driver.find_element(By.NAME, f'lipid_ratio[upper][peg{new_l}]')
+            u.clear()
+            u.send_keys(upper)
+            l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][peg{new_l}]')
+            l.clear()
+            l.send_keys(lower)
+        except:
+            u = self.driver.find_element(By.NAME, f'lipid_number[upper][peg{new_l}]')
+            u.clear()
+            u.send_keys(upper)
+            l = self.driver.find_element(By.NAME, f'lipid_number[lower][peg{new_l}]')
+            l.clear()
+            l.send_keys(lower)
 
     def add_glycolipid(self, GRS, upper=1, lower=1):
         """
@@ -1249,30 +1292,71 @@ class MembraneProtein(CharmmGuiAuto):
             upper (int): Number of lipids in the upper leaflet (default is 1).
             lower (int): Number of lipids in the lower leaflet (default is 1).
         """
-        prevs = [i.get_attribute('value') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "GLP")]')]
-        if len(prevs) != 0:
-            prev = sorted(set(prevs))[-1][-1]
-            new = chr(ord(prev) + 1).upper()
-        else:
-            new = 'A'
+        # prevs = [i.get_attribute('value') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "GLP")]')]
+        # prevs = [i.get_attribute('onclick') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "GLP")][@type="button"]')]
+        # print(prevs)
+        # self.driver.find_element(By.ID, 'add_number_gl').click()
+        # prevs = [i.get_attribute('onclick') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "GLP")][@type="button"]')]
+        # print(prevs)
+        # self.driver.find_element(By.ID, 'add_number_gl').click()
+        # if len(prevs) != 0:
+        #     prev = sorted(set(prevs))[-1][-1]
+        #     new = chr(ord(prev) + 1).upper()
+        #     row  = len(prev)
+        # else: 
+        #     new = 'A'
+        #     row  = 1 
+        # new_l = new.lower()
+        # try:
+        #     self.driver.find_element(By.ID, 'add_ratio_gl').click()
+        # except:
+        #     self.driver.find_element(By.ID, 'add_number_gl').click()
+
+        prevs = [i.get_attribute('value') for i in self.driver.find_elements(By.XPATH, '//input[starts-with(@value, "GLP")][@type="button"]')]
+        prev = sorted(set(prevs))[-1][-1]
+        new = chr(ord(prev) + 1).upper()
+        row  = ord(new) - 64
+        try:
+            self.driver.find_element(By.ID, 'add_ratio_gl').click()
+        except:
+            self.driver.find_element(By.ID, 'add_number_gl').click()
         new_l = new.lower()
-        self.driver.find_element(By.ID, 'add_ratio_gl').click()
+
         main_window = self.driver.window_handles[0]
-        self.driver.find_element(By.XPATH, f"//input[@value=\"GLP{new}\"]").click()
+        element = self.driver.find_element(By.ID, "footer")
+        self.driver.execute_script("arguments[0].scrollIntoView()", element)
+        #element = self.driver.find_element(By.XPATH, f"//input[@type='button'][@value=\"GLP{new}\"]") 
+        try:
+            element  = self.driver.find_element(By.CSS_SELECTOR, f"#liptype_ratio_gl > tbody:nth-child({row}) > tr:nth-child(1) > td:nth-child(1) > input:nth-child(1)")
+            element.click()
+        except:
+            element  = self.driver.find_element(By.CSS_SELECTOR, f"#liptype_number_gl > tbody:nth-child({row}) > tr:nth-child(1) > td:nth-child(1) > input:nth-child(1)")
+            element.click()
         popup = self.driver.window_handles[-1]
         self.driver.switch_to.window(popup)
         time.sleep(2)
         self.GRS_reader(GRS=GRS, skip=1)
         self.nxt()
         self.driver.switch_to.window(main_window)
-        u = self.driver.find_element(By.NAME, f'lipid_ratio[upper][glp{new_l}]')
-        u.clear()
-        u.send_keys(upper)
-        l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][glp{new_l}]')
-        l.clear()
-        l.send_keys(lower)
+        time.sleep(2)
+        try:
+            u = self.driver.find_element(By.NAME, f'lipid_ratio[upper][glp{new_l}]')
+            u.clear()
+            u.send_keys(upper)
+            l = self.driver.find_element(By.NAME, f'lipid_ratio[lower][glp{new_l}]')
+            l.clear()
+            l.send_keys(lower)
+        except:
+            u = self.driver.find_element(By.NAME, f'lipid_number[upper][glp{new_l}]')
+            u.clear()
+            u.send_keys(upper)
+            l = self.driver.find_element(By.NAME, f'lipid_number[lower][glp{new_l}]')
+            l.clear()
+            l.send_keys(lower)
+        time.sleep(2)
+        
 
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lengthXY={'option': None, 'value': 100}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
         """
         Runs the membrane protein setup and simulation.
 
@@ -1357,7 +1441,7 @@ class MembraneProtein(CharmmGuiAuto):
             self.projection(**projection)
             self.box_type(**boxtype)
             self.lengthZ(**lengthZ)
-            self.lengthXY('ratio', size)
+            self.lengthXY(**lengthXY)
             if lipids is not None:
                 for lipid in lipids:
                     self.add_lipid(**lipid)
@@ -1371,8 +1455,23 @@ class MembraneProtein(CharmmGuiAuto):
                 for glycolipid in glycolipids:
                     self.add_glycolipid(**glycolipid)
             self.show_system_info()
+            time.sleep(2)
             self.wait_text('Calculated XY System Size')
             self.nxt()
+            time.sleep(10)
+            try:
+                WebDriverWait(self.driver, 30).until(EC.alert_is_present()) #,
+                                            #'Timed out waiting for PA creation ' +
+                                            #'confirmation popup to appear.')
+
+                self.driver.switch_to.alert.accept()
+                message = '''The alert 
+                'There is an issue on system size calculation. You may want to choose other method to resolve this issue. Do you want to proceed?' 
+                was accepted. Please check the output thoroughly. 
+                '''
+                print(message)
+            except:
+                pass
             self.wait_text("Component Building Options")
             self.clear_ion()
             self.add_ion('NaCl')
@@ -1406,7 +1505,7 @@ class Membrane(MembraneProtein):
     Membrane setup simulation.
     """
 
-    def run(self, email, password, download_now=True, boxtype=None, lengthZ=None, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options=None, engine='gmx', temp='310'):
+    def run(self, email, password, download_now=True, boxtype=None, lengthZ=None, lengthXY={'option': None, 'value': 200}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options=None, engine='gmx', temp='310'):
         """
         Runs the membrane setup and simulation.
 
@@ -1434,7 +1533,7 @@ class Membrane(MembraneProtein):
             self.wait_text('default surface area')
             jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
             print(jobid)
-            self.lengthXY('ratio', size)
+            self.lengthXY(**lengthXY)
             if lipids is not None:
                 for lipid in lipids:
                     self.add_lipid(**lipid)
@@ -1448,8 +1547,24 @@ class Membrane(MembraneProtein):
                 for glycolipid in glycolipids:
                     self.add_glycolipid(**glycolipid)
             self.show_system_info()
+            time.sleep(2)
             self.wait_text('Calculated XY System Size')
             self.nxt()
+            time.sleep(10)
+            try:
+                WebDriverWait(self.driver, 30).until(EC.alert_is_present()) #,
+                                            #'Timed out waiting for PA creation ' +
+                                            #'confirmation popup to appear.')
+
+                self.driver.switch_to.alert.accept()
+                message = '''The alert 
+                'There is an issue on system size calculation. You may want to choose other method to resolve this issue. Do you want to proceed?' 
+                was accepted. Please check the output thoroughly. 
+                '''
+                print(message)
+            except:
+                pass
+            # There is an issue on system size calculation. You may want to choose other method to resolve this issue. Do you want to proceed?
             self.wait_text("Component Building Options")
             self.clear_ion()
             self.add_ion('NaCl')
