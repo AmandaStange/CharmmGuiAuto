@@ -1,3 +1,16 @@
+##############################################################################
+##   Complex Membrane based on the Brain Plasma Membrane from the paper:    ## 
+##                                                                          ##            
+##  Helgi I. Ingólfsson, Harsh Bhatia, Talia Zeppelin, W. F. Drew Bennett,  ##
+##  Kristy A. Carpenter, Pin-Chia Hsu, Gautham Dharuman, Peer-Timo Bremer,  ##
+##  Birgit Schiøtt, Felice C. Lightstone, and Timothy S. Carpenter The      ##      
+##  Journal of Physical Chemistry B 2020 124 (36), 7819-7829                ## 
+##  DOI: 10.1021/acs.jpcb.0c03368                                           ##     
+##                                                                          ##     
+##  The lipid GLPA/PNGS (16:0/24:1) is not available in CharmmGUI so has    ##      
+##  been replaced with GLPA/PNGS (18:1/24:1)                                ##       
+##                                                                          ##       
+##############################################################################
 system_type:
   system_type: M   # M for a membrane only system
 system_info:
