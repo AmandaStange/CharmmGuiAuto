@@ -164,33 +164,57 @@ class CharmmGuiAuto:
         else:
             self.driver.find_element(By.ID, 'hbuild_checked').click()
 
-    def read_het(self, het):
+    def read_het(self, het='UNK', source='sdf', gen_with='cgenff', lig_filename='UNK', ph_ligand=True, path=None):
         """
         Selects parameters for non-protein chains/molecules.
 
         Parameters:
             het (str): Type of non-protein molecule ('CO3' for IONIZED CARBONATE, ADM JR., AUG 2001 or 'CO31' for HO3, BICARBONATE, XXWY & KEVO).
+            source (str): Type of input files provided (mol2, sdf)
+            gen_with (str): Type of programme used to generate the ligand parameters ('cgenff', 'antechamber', 'openff', 'charmm', 'CSML')
+            lig_filename (str): File name of your source file. Assumes that path is the same as for the input PDB.
+
+            WARNING: if gen_with == 'charmm' it is assumed that the .top and .par have the same filename
         """
-        if het == 'CO3':
+        if het is None:
+            het = 'UNK'
+        print('reading het')
+        if gen_with == 'CSML':
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
             main_window = self.driver.window_handles[0]
             self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[4]').click()
             popup = self.driver.window_handles[-1]
             self.driver.switch_to.window(popup)
             time.sleep(8)
-            self.driver.find_element(By.XPATH, "//input[@value='CO3']").click()
+            self.driver.find_element(By.XPATH, f"//input[@value='{het}']").click()
             self.nxt()
             self.driver.switch_to.window(main_window)
-        elif het == 'CO31':
-            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
-            main_window = self.driver.window_handles[0]
-            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[4]').click()
-            popup = self.driver.window_handles[-1]
-            self.driver.switch_to.window(popup)
-            time.sleep(8)
-            self.driver.find_element(By.XPATH, "//input[@value='CO31']").click()
-            self.nxt()
-            self.driver.switch_to.window(main_window)
+        elif gen_with == 'charmm':
+            self.driver.find_element(By.XPATH, f"//input[@value='{gen_with}']").click()
+            choose_file = self.driver.find_element(By.NAME, f'top[{het}]')
+            file_location = os.path.join(path, lig_filename+'.top')
+            choose_file.send_keys(file_location)
+            choose_file = self.driver.find_element(By.NAME, f'par[{het}]')
+            file_location = os.path.join(path, lig_filename+'.par')
+            choose_file.send_keys(file_location)
+        else:
+            self.driver.find_element(By.XPATH, f"//input[@value='{gen_with}']").click()
+            self.driver.find_element(By.XPATH, f"//input[@name='rename_option[{gen_with}][{het}]' and @value='{source}']").click()
+            choose_file = self.driver.find_element(By.NAME, f'{source}_{gen_with}[{het}]')
+            file_location = os.path.join(path, lig_filename+'.'+source)
+            choose_file.send_keys(file_location)
+            # self.driver.find_element(By.XPATH, f"//input[@id='ph_ligand]").click()
+        element = self.driver.find_element(By.XPATH, f"//input[@id='ph_ligand' and @name='ph_ligand[{het}]']")
+        sel = element.is_selected()
+        if sel is not ph_ligand:
+            element.click()
+
+
+
+
+
+
+        
 
     def add_mutation(self, chain, rid, aa):
         """
@@ -628,7 +652,7 @@ class CharmmGuiAuto:
         os.system(f'rm -r {out_tmp}')
         print('Unpacked')
 
-    def manipulate_PDB(self, path=None, file_name=None, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None):
+    def manipulate_PDB(self, path=None, file_name=None, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None):
         """
         Manipulates a PDB file with various options.
 
@@ -665,8 +689,10 @@ class CharmmGuiAuto:
         if chains is not None:
             for chain in chains:
                 self.patch(chain[0], chain[1], chain[2])
-        if het is not None:
-            self.read_het(het)
+        if hets is not None:
+            for het in hets:
+                self.read_het(**het, path=path)
+                #self.read_het(het, source, gen_with, lig_filename, ph_ligand, path)
         self.system_pH(pH)
         self.preserve(**preserve)
         if mutations is not None:
@@ -686,6 +712,7 @@ class CharmmGuiAuto:
             for glycan in glycans:
                 self.add_glycan(**glycan, skip=1)
         return jobid
+        time.sleep(1000)
 
 class Retrieve(CharmmGuiAuto):
     def run(self, email, password, jobid):
@@ -734,7 +761,7 @@ class Retrieve(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class PDBReader(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None):
         """
         Runs the PDB Reader and manipulates a PDB file.
 
@@ -761,7 +788,7 @@ class PDBReader(CharmmGuiAuto):
             self.login(email, password)
             self.wait_text('PDB Reader & Manipulator')
             time.sleep(1)
-            jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
+            jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, hets, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
             self.nxt()
             self.wait_text('Computed Energy')
             if download_now:
@@ -978,7 +1005,7 @@ class SolutionProtein(CharmmGuiAuto):
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
             if het is not None:
-                self.read_het(het)
+                self.read_het(het, source, gen_with, lig_filename, ph_ligand)
             self.system_pH(pH)
             self.preserve(**preserve)
             if mutations is not None:
@@ -1412,7 +1439,7 @@ class MembraneProtein(CharmmGuiAuto):
                 for chain in chains:
                     self.patch(chain[0], chain[1], chain[2])
             if het is not None:
-                self.read_het(het)
+                self.read_het(het, source, gen_with, lig_filename, ph_ligand)
             self.system_pH(pH)
             self.preserve(**preserve)
             if mutations is not None:
