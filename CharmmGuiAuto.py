@@ -180,9 +180,11 @@ class CharmmGuiAuto:
             het = 'UNK'
         print('reading het')
         if gen_with == 'CSML':
-            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
+            # self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
+            self.driver.find_element(By.XPATH, f'//input[@name="rename[{het}]" and @value="rename"]').click()
             main_window = self.driver.window_handles[0]
-            self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[4]').click()
+            # self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[4]').click()
+            self.driver.find_element(By.XPATH, f'//input[@type="button" and @onclick="openCSMLSearch(\'{het}\')"]').click()
             popup = self.driver.window_handles[-1]
             self.driver.switch_to.window(popup)
             time.sleep(8)
