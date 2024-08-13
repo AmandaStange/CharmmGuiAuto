@@ -180,10 +180,8 @@ class CharmmGuiAuto:
             het = 'UNK'
         print('reading het')
         if gen_with == 'CSML':
-            # self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[2]').click()
             self.driver.find_element(By.XPATH, f'//input[@name="rename[{het}]" and @value="rename"]').click()
             main_window = self.driver.window_handles[0]
-            # self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div[3]/div[3]/form/div[2]/table/tbody/tr[2]/td[2]/input[4]').click()
             self.driver.find_element(By.XPATH, f'//input[@type="button" and @onclick="openCSMLSearch(\'{het}\')"]').click()
             popup = self.driver.window_handles[-1]
             self.driver.switch_to.window(popup)
@@ -872,7 +870,7 @@ class FFConverter(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class PDBReaderFFConverter(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, PBC=False, PBC_x=10, systype='Solution', ff='c36m', amber_options = None, engine='gmx', temp=310):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, hets=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, PBC=False, PBC_x=10, systype='Solution', ff='c36m', amber_options = None, engine='gmx', temp=310):
         """
         Runs both the PDB Reader and Force Field Converter.
 
@@ -960,7 +958,7 @@ class PDBReaderFFConverter(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
         """
         Runs the Solution Protein setup and simulation.
 
@@ -1003,29 +1001,31 @@ class SolutionProtein(CharmmGuiAuto):
             self.model_select(model)
             self.nxt()
             self.wait_text("PDB Manipulation Options")
-            if chains is not None:
-                for chain in chains:
-                    self.patch(chain[0], chain[1], chain[2])
-            if het is not None:
-                self.read_het(het, source, gen_with, lig_filename, ph_ligand)
-            self.system_pH(pH)
-            self.preserve(**preserve)
-            if mutations is not None:
-                for mutation in mutations:
-                    self.add_mutation(**mutation)
-            if protonations is not None:
-                for protonation in protonations:
-                    self.add_protonation(**protonation)
-            if disulfides is not None:
-                for disulfide in disulfides:
-                    self.add_disulfide(**disulfide)
-            if phosphorylations is not None:
-                for phosphorylation in phosphorylations:
-                    self.add_phosphorylation(**phosphorylation)
-            self.add_gpi(**gpi, skip=6)
-            if glycans is not None:
-                for glycan in glycans:
-                    self.add_glycan(**glycan, skip=1)
+            jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, hets, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
+
+            # if chains is not None:
+            #     for chain in chains:
+            #         self.patch(chain[0], chain[1], chain[2])
+            # if het is not None:
+            #     self.read_het(het, source, gen_with, lig_filename, ph_ligand)
+            # self.system_pH(pH)
+            # self.preserve(**preserve)
+            # if mutations is not None:
+            #     for mutation in mutations:
+            #         self.add_mutation(**mutation)
+            # if protonations is not None:
+            #     for protonation in protonations:
+            #         self.add_protonation(**protonation)
+            # if disulfides is not None:
+            #     for disulfide in disulfides:
+            #         self.add_disulfide(**disulfide)
+            # if phosphorylations is not None:
+            #     for phosphorylation in phosphorylations:
+            #         self.add_phosphorylation(**phosphorylation)
+            # self.add_gpi(**gpi, skip=6)
+            # if glycans is not None:
+            #     for glycan in glycans:
+            #         self.add_glycan(**glycan, skip=1)
             self.nxt()
             self.wait_text("Add Ions")
             self.waterbox(**waterbox)
@@ -1385,7 +1385,7 @@ class MembraneProtein(CharmmGuiAuto):
         time.sleep(2)
         
 
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lengthXY={'option': None, 'value': 100}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lengthXY={'option': None, 'value': 100}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
         """
         Runs the membrane protein setup and simulation.
 
@@ -1437,29 +1437,31 @@ class MembraneProtein(CharmmGuiAuto):
             self.model_select(model)
             self.nxt()
             self.wait_text("PDB Manipulation Options")
-            if chains is not None:
-                for chain in chains:
-                    self.patch(chain[0], chain[1], chain[2])
-            if het is not None:
-                self.read_het(het, source, gen_with, lig_filename, ph_ligand)
-            self.system_pH(pH)
-            self.preserve(**preserve)
-            if mutations is not None:
-                for mutation in mutations:
-                    self.add_mutation(**mutation)
-            if protonations is not None:
-                for protonation in protonations:
-                    self.add_protonation(**protonation)
-            if disulfides is not None:
-                for disulfide in disulfides:
-                    self.add_disulfide(**disulfide)
-            if phosphorylations is not None:
-                for phosphorylation in phosphorylations:
-                    self.add_phosphorylation(**phosphorylation)
-            self.add_gpi(**gpi, skip=6)
-            if glycans is not None:
-                for glycan in glycans:
-                    self.add_glycan(**glycan, skip=1)
+            jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, hets, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
+
+            # if chains is not None:
+            #     for chain in chains:
+            #         self.patch(chain[0], chain[1], chain[2])
+            # if het is not None:
+            #     self.read_het(het, source, gen_with, lig_filename, ph_ligand)
+            # self.system_pH(pH)
+            # self.preserve(**preserve)
+            # if mutations is not None:
+            #     for mutation in mutations:
+            #         self.add_mutation(**mutation)
+            # if protonations is not None:
+            #     for protonation in protonations:
+            #         self.add_protonation(**protonation)
+            # if disulfides is not None:
+            #     for disulfide in disulfides:
+            #         self.add_disulfide(**disulfide)
+            # if phosphorylations is not None:
+            #     for phosphorylation in phosphorylations:
+            #         self.add_phosphorylation(**phosphorylation)
+            # self.add_gpi(**gpi, skip=6)
+            # if glycans is not None:
+            #     for glycan in glycans:
+            #         self.add_glycan(**glycan, skip=1)
             self.nxt()
             self.wait_text("Area Calculation Options")
             self.orientation(**orientation)
