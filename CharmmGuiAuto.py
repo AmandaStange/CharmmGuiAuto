@@ -108,7 +108,7 @@ class CharmmGuiAuto:
         except:
             self.nxt()
 
-    def wait_text(self, text, start_time=None):
+    def wait_text(self, text, text2=None, start_time=None):
         """
         Waits until the specified text is visible on the page.
 
@@ -126,6 +126,8 @@ class CharmmGuiAuto:
             try:
                 wait = WebDriverWait(self.driver, 300)
                 element = wait.until(EC.text_to_be_present_in_element((By.ID, "body"), text))
+                if text2 is not None:
+                    element = wait.until(EC.text_to_be_present_in_element((By.ID, "body"), text2))
                 print('Found it!')
             except:
                 try:
@@ -675,10 +677,10 @@ class CharmmGuiAuto:
         Returns:
             jobid (str): Job ID for the manipulated PDB file.
         """
-        if file_name is not None:
-            self.upload(file_name, path)
-        else:
-            self.from_pdb(pdb_id)
+        # if file_name is not None:
+        #     self.upload(file_name, path)
+        # else:
+        #     self.from_pdb(pdb_id)
 
         self.wait_text("Model/Chain Selection Option")
         jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
@@ -787,6 +789,11 @@ class PDBReader(CharmmGuiAuto):
         try:
             self.login(email, password)
             self.wait_text('PDB Reader & Manipulator')
+            time.sleep(5)
+            if file_name is not None:
+                self.upload(file_name, path)
+            else:
+                self.from_pdb(pdb_id)
             time.sleep(1)
             jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, hets, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
             self.nxt()
@@ -904,6 +911,10 @@ class PDBReaderFFConverter(CharmmGuiAuto):
             self.login(email, password)
             self.wait_text('PDB Reader & Manipulator')
             time.sleep(1)
+            if file_name is not None:
+                self.upload(file_name, path)
+            else:
+                self.from_pdb(pdb_id)
             jobid1 = self.manipulate_PDB(path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
             self.nxt()
             self.wait_text('Computed Energy')
@@ -991,16 +1002,17 @@ class SolutionProtein(CharmmGuiAuto):
         try:
             self.login(email, password)
             self.wait_text("Protein Solution System")
+            time.sleep(2)
             if file_name is not None:
                 self.upload(file_name, path)
             else:
                 self.from_pdb(pdb_id)
             self.wait_text("Model/Chain Selection Option")
-            jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
-            print(jobid)
-            self.model_select(model)
-            self.nxt()
-            self.wait_text("PDB Manipulation Options")
+            # jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
+            # print(jobid)
+            # self.model_select(model)
+            # self.nxt()
+            # self.wait_text("PDB Manipulation Options")
             jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, hets, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
 
             # if chains is not None:
@@ -1427,16 +1439,18 @@ class MembraneProtein(CharmmGuiAuto):
         try:
             self.login(email, password)
             self.wait_text("Protein/Membrane System")
+            time.sleep(2)
             if file_name is not None:
                 self.upload(file_name, path)
             else:
                 self.from_pdb(pdb_id)
-            self.wait_text("Model/Chain Selection Option")
-            jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
-            print(jobid)
-            self.model_select(model)
-            self.nxt()
-            self.wait_text("PDB Manipulation Options")
+            
+            # self.wait_text("Model/Chain Selection Option")
+            # jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
+            # print(jobid)
+            # self.model_select(model)
+            # self.nxt()
+            # self.wait_text("PDB Manipulation Options")
             jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, hets, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
 
             # if chains is not None:
