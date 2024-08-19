@@ -1169,7 +1169,7 @@ class MembraneProtein(CharmmGuiAuto):
         self.driver.find_element(By.NAME, default[o][1]).clear()
         self.driver.find_element(By.NAME, default[o][1]).send_keys(value)
 
-    def lengthXY(self, option=None, value=None):
+    def lengthXY(self, option='ratio', value=20):
         """
         Sets the length in the XY direction.
 
@@ -1183,8 +1183,8 @@ class MembraneProtein(CharmmGuiAuto):
         if option == 'nlipid':
             self.driver.find_elements(By.ID, 'hetero_xy_nlipid')[0].click()
         else:
-            self.driver.find_element(By.NAME, options[option]).clear()
-            self.driver.find_element(By.NAME, options[option]).send_keys(value)
+            self.driver.find_element(By.XPATH, '//input[@name="hetero_lx" and @type="text"]').clear()
+            self.driver.find_element(By.XPATH, '//input[@name="hetero_lx" and @type="text"]').send_keys(value)
 
     def add_lipid(self, lipid, upper, lower):
         """
@@ -1397,7 +1397,7 @@ class MembraneProtein(CharmmGuiAuto):
         time.sleep(2)
         
 
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lengthXY={'option': None, 'value': 100}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
+    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lengthXY={'option': 'ratio', 'value': 100}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
         """
         Runs the membrane protein setup and simulation.
 
@@ -1550,7 +1550,7 @@ class Membrane(MembraneProtein):
     Membrane setup simulation.
     """
 
-    def run(self, email, password, download_now=True, boxtype=None, lengthZ=None, lengthXY={'option': None, 'value': 200}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options=None, engine='gmx', temp='310'):
+    def run(self, email, password, download_now=True, boxtype=None, lengthZ=None, lengthXY={'option': 'ratio', 'value': 200}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options=None, engine='gmx', temp='310'):
         """
         Runs the membrane setup and simulation.
 
