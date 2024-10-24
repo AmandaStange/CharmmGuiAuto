@@ -151,8 +151,16 @@ class CharmmGuiAuto:
         if option is None:
             pass
         else:
-            for i in range(4, 4 + int(option)):
-                self.driver.find_element(By.XPATH, f'/html/body/div[4]/div[2]/div[3]/div[2]/form/div/table/tbody/tr[{i}]/td[1]/input').click()
+            check = False
+            i = 4
+            while not check:
+                if option == 0:
+                    break
+                if self.driver.find_element(By.XPATH, f'/html/body/div[4]/div[2]/div[3]/div[2]/form/div/table/tbody/tr[{i}]/td[1]/input').is_selected():
+                    i += 1
+                else:
+                    self.driver.find_element(By.XPATH, f'/html/body/div[4]/div[2]/div[3]/div[2]/form/div/table/tbody/tr[{i}]/td[1]/input').click()
+                    option -= 1
 
     def preserve(self, option=None):
         """
