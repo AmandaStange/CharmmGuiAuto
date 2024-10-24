@@ -47,7 +47,7 @@ class CharmmGuiAuto:
         options.set_preference("browser.download.improvements_to_download_panel", True)
         options.set_preference("browser.download.manager.closeWhenDone", True)
         #options.headless = True
-        if headless == 'true':
+        if headless is True:
             options.add_argument("--headless")
         self.driver = webdriver.Firefox(options=options)
         if system == 'membrane':
