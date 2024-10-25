@@ -136,7 +136,7 @@ class CharmmGuiAuto:
                     self.driver.save_screenshot("screenshot_error.png")
                     self.driver.quit()
                 except:
-                    self.wait_text(text, start_time)
+                    self.wait_text(text, start_time=start_time)
         except:
             print('window has been closed')
             self.driver.quit()
