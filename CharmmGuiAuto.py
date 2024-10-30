@@ -61,10 +61,25 @@ class CharmmGuiAuto:
         elif system == 'converter':
             self.driver.get('https://www.charmm-gui.org/?doc=input/converter.ffconverter')
 
-    def nxt(self):
+    def take_full_page_screenshot(self, file_path, jobid):
+            os.system(f'mkdir -p {self.path_out}/Screenshots/')
+            # Set the viewport to the full height of the page
+            scroll_height = self.driver.execute_script("return document.documentElement.scrollHeight")
+            self.driver.set_window_size(1920, scroll_height+75)  # Set width and height for full-page capture
+
+            # Take and save the screenshot
+            self.driver.save_screenshot(f'{self.path_out}/Screenshots/' + jobid.split()[2] + '_' + file_path)
+            print(file_path)
+
+    def nxt(self, prev_step=None, screen=False, jobid=None):
         """
         Presses the 'Next' button on the current page.
         """
+        
+
+        if screen:
+            self.take_full_page_screenshot(file_path=f"{prev_step.replace(' ', '_')}.png", jobid=jobid)
+
         self.driver.find_element(By.ID, 'nextBtn').click()
 
     def login(self, email, password):
@@ -224,7 +239,7 @@ class CharmmGuiAuto:
 
 
 
-        
+
 
     def add_mutation(self, chain, rid, aa):
         """
@@ -771,7 +786,7 @@ class Retrieve(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class PDBReader(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None):
+    def run(self, email, password, path=None, screenshot=False, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None):
         """
         Runs the PDB Reader and manipulates a PDB file.
 
@@ -804,7 +819,7 @@ class PDBReader(CharmmGuiAuto):
                 self.from_pdb(pdb_id)
             time.sleep(1)
             jobid = self.manipulate_PDB(path, file_name, pdb_id, model, chains, hets, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
-            self.nxt()
+            self.nxt(prev_step="PDB Manipulation", screen=screenshot, jobid=jobid)
             self.wait_text('Computed Energy')
             if download_now:
                 print(f'Ready to download from retrieve job id {jobid}')
@@ -820,7 +835,7 @@ class PDBReader(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class FFConverter(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, PBC=False, PBC_x=10, systype='Solution', ff='c36m', amber_options=None, engine='gmx', temp=310):
+    def run(self, email, password, path=None, screenshot=False, file_name=None, download_now=True, PBC=False, PBC_x=10, systype='Solution', ff='c36m', amber_options=None, engine='gmx', temp=310):
         """
         Runs the Force Field Converter.
 
@@ -869,7 +884,7 @@ class FFConverter(CharmmGuiAuto):
             self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
-            self.nxt()
+            self.nxt(prev_step="System Information", screen=screenshot, jobid=jobid)
             self.wait_text("to continue equilibration and production simulations")
             if download_now:
                 print(f'Ready to download from retrieve job id {jobid}')
@@ -885,7 +900,7 @@ class FFConverter(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class PDBReaderFFConverter(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, hets=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, PBC=False, PBC_x=10, systype='Solution', ff='c36m', amber_options = None, engine='gmx', temp=310):
+    def run(self, email, password, path=None, screenshot=False, file_name=None, download_now=True, pdb_id=None, model=None, hets=None, chains=None, het=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, PBC=False, PBC_x=10, systype='Solution', ff='c36m', amber_options = None, engine='gmx', temp=310):
         """
         Runs both the PDB Reader and Force Field Converter.
 
@@ -924,7 +939,7 @@ class PDBReaderFFConverter(CharmmGuiAuto):
             else:
                 self.from_pdb(pdb_id)
             jobid1 = self.manipulate_PDB(path, file_name, pdb_id, model, chains, het, pH, preserve, mutations, protonations, disulfides, phosphorylations, gpi, glycans)
-            self.nxt()
+            self.nxt(prev_step="PDB Manipulation", screen=screenshot, jobid=jobid1)
             self.wait_text('Computed Energy')
             print(f'Ready to download from retrieve job id {jobid1}')
             self.download(jobid1)
@@ -961,7 +976,7 @@ class PDBReaderFFConverter(CharmmGuiAuto):
             self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
-            self.nxt()
+            self.nxt(prev_step="PDB Manipulation", screen=screenshot, jobid=jobid)
             self.wait_text("to continue equilibration and production simulations")
             if download_now:
                 print(f'Ready to download from retrieve job id {jobid}')
@@ -977,7 +992,7 @@ class PDBReaderFFConverter(CharmmGuiAuto):
             raise ValueError('A very specific bad thing happened.')
 
 class SolutionProtein(CharmmGuiAuto):
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
+    def run(self, email, password, path=None, file_name=None, screenshot=False, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310', waterbox={'dis': 10.0}, ion_method=None):
         """
         Runs the Solution Protein setup and simulation.
 
@@ -1046,21 +1061,21 @@ class SolutionProtein(CharmmGuiAuto):
             # if glycans is not None:
             #     for glycan in glycans:
             #         self.add_glycan(**glycan, skip=1)
-            self.nxt()
+            self.nxt(prev_step="PDB Manipulation", screen=screenshot, jobid=jobid)
             self.wait_text("Add Ions")
             self.waterbox(**waterbox)
             self.ion_method(ion_method)
             self.clear_ion()
             self.add_ion(ions)
             self.calc_solv()
-            self.nxt()
+            self.nxt(prev_step="Add Ions", screen=screenshot, jobid=jobid)
             self.wait_text('Periodic Boundary Condition Options')
-            self.nxt()
+            self.nxt(prev_step="Periodic Boundary Condition Options", screen=screenshot, jobid=jobid)
             self.wait_text("Force Field Options")
             self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
-            self.nxt()
+            self.nxt(prev_step="Force Field Options", screen=screenshot, jobid=jobid)
             self.wait_text("to continue equilibration and production simulations")
             if download_now:
                 print(f'Ready to download from retrieve job id {jobid}')
@@ -1352,9 +1367,9 @@ class MembraneProtein(CharmmGuiAuto):
         #     prev = sorted(set(prevs))[-1][-1]
         #     new = chr(ord(prev) + 1).upper()
         #     row  = len(prev)
-        # else: 
+        # else:
         #     new = 'A'
-        #     row  = 1 
+        #     row  = 1
         # new_l = new.lower()
         # try:
         #     self.driver.find_element(By.ID, 'add_ratio_gl').click()
@@ -1374,7 +1389,7 @@ class MembraneProtein(CharmmGuiAuto):
         main_window = self.driver.window_handles[0]
         element = self.driver.find_element(By.ID, "footer")
         self.driver.execute_script("arguments[0].scrollIntoView()", element)
-        #element = self.driver.find_element(By.XPATH, f"//input[@type='button'][@value=\"GLP{new}\"]") 
+        #element = self.driver.find_element(By.XPATH, f"//input[@type='button'][@value=\"GLP{new}\"]")
         try:
             element  = self.driver.find_element(By.CSS_SELECTOR, f"#liptype_ratio_gl > tbody:nth-child({row}) > tr:nth-child(1) > td:nth-child(1) > input:nth-child(1)")
             element.click()
@@ -1403,9 +1418,9 @@ class MembraneProtein(CharmmGuiAuto):
             l.clear()
             l.send_keys(lower)
         time.sleep(2)
-        
 
-    def run(self, email, password, path=None, file_name=None, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lengthXY={'option': 'ratio', 'value': 100}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
+
+    def run(self, email, password, path=None, file_name=None, screenshot=False, download_now=True, pdb_id=None, model=None, chains=None, hets=None, pH=None, preserve={'option': None}, mutations=None, protonations=None, disulfides=None, phosphorylations=None, gpi={'GRS': None}, glycans=None, orientation={'option':'PDB'}, position={'option': None}, area={'option': None}, projection={'option': None}, boxtype={'option': None}, lengthZ=None, lengthXY={'option': 'ratio', 'value': 100}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options = None, engine='gmx', temp='310'):
         """
         Runs the membrane protein setup and simulation.
 
@@ -1452,7 +1467,7 @@ class MembraneProtein(CharmmGuiAuto):
                 self.upload(file_name, path)
             else:
                 self.from_pdb(pdb_id)
-            
+
             # self.wait_text("Model/Chain Selection Option")
             # jobid = self.driver.find_element(By.CLASS_NAME, "jobid").text
             # print(jobid)
@@ -1484,12 +1499,12 @@ class MembraneProtein(CharmmGuiAuto):
             # if glycans is not None:
             #     for glycan in glycans:
             #         self.add_glycan(**glycan, skip=1)
-            self.nxt()
+            self.nxt(prev_step="PDB Manipulation", screen=screenshot, jobid=jobid)
             self.wait_text("Area Calculation Options")
             self.orientation(**orientation)
             self.position(**position)
             self.area(**area)
-            self.nxt()
+            self.nxt(prev_step="Orientation Options", screen=screenshot, jobid=jobid)
             self.wait_text('default surface area')
             self.projection(**projection)
             self.box_type(**boxtype)
@@ -1510,7 +1525,7 @@ class MembraneProtein(CharmmGuiAuto):
             self.show_system_info()
             time.sleep(2)
             self.wait_text('Calculated XY System Size')
-            self.nxt()
+            self.nxt(prev_step="Lipid Options", screen=screenshot, jobid=jobid)
             time.sleep(10)
             try:
                 WebDriverWait(self.driver, 30).until(EC.alert_is_present()) #,
@@ -1518,9 +1533,9 @@ class MembraneProtein(CharmmGuiAuto):
                                             #'confirmation popup to appear.')
 
                 self.driver.switch_to.alert.accept()
-                message = '''The alert 
-                'There is an issue on system size calculation. You may want to choose other method to resolve this issue. Do you want to proceed?' 
-                was accepted. Please check the output thoroughly. 
+                message = '''The alert
+                'There is an issue on system size calculation. You may want to choose other method to resolve this issue. Do you want to proceed?'
+                was accepted. Please check the output thoroughly.
                 '''
                 print(message)
             except:
@@ -1529,16 +1544,16 @@ class MembraneProtein(CharmmGuiAuto):
             self.clear_ion()
             self.add_ion('NaCl')
             self.driver.find_element(By.XPATH, "//*[starts-with(@onclick, 'update_nion')]").click()
-            self.nxt()
+            self.nxt(prev_step="Component Building Options", screen=screenshot, jobid=jobid)
             self.wait_text('Building Ion and Waterbox')
-            self.nxt()
+            self.nxt(prev_step="Building Ion and Waterbox", screen=screenshot, jobid=jobid)
             self.wait_text('Assemble Generated Components')
-            self.nxt()
+            self.nxt(prev_step="Assemble Generated Components", screen=screenshot, jobid=jobid)
             self.wait_text("Force Field Options")
             self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
-            self.nxt()
+            self.nxt(prev_step="Force Field Options", screen=screenshot, jobid=jobid)
             self.wait_text("Equilibration Input Notes")
             if download_now:
                 print(f'Ready to download from retrieve job id {jobid}')
@@ -1558,7 +1573,7 @@ class Membrane(MembraneProtein):
     Membrane setup simulation.
     """
 
-    def run(self, email, password, download_now=True, boxtype=None, lengthZ=None, lengthXY={'option': 'ratio', 'value': 200}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options=None, engine='gmx', temp='310'):
+    def run(self, email, password, download_now=True, screenshot=False, boxtype=None, lengthZ=None, lengthXY={'option': 'ratio', 'value': 200}, lipids=None, naas=None, pegs=None, glycolipids=None, size=100, ions='NaCl', ff='c36m', amber_options=None, engine='gmx', temp='310'):
         """
         Runs the membrane setup and simulation.
 
@@ -1602,7 +1617,7 @@ class Membrane(MembraneProtein):
             self.show_system_info()
             time.sleep(2)
             self.wait_text('Calculated XY System Size')
-            self.nxt()
+            self.nxt(prev_step="Lipid Options", screen=screenshot, jobid=jobid)
             time.sleep(10)
             try:
                 WebDriverWait(self.driver, 30).until(EC.alert_is_present()) #,
@@ -1610,9 +1625,9 @@ class Membrane(MembraneProtein):
                                             #'confirmation popup to appear.')
 
                 self.driver.switch_to.alert.accept()
-                message = '''The alert 
-                'There is an issue on system size calculation. You may want to choose other method to resolve this issue. Do you want to proceed?' 
-                was accepted. Please check the output thoroughly. 
+                message = '''The alert
+                'There is an issue on system size calculation. You may want to choose other method to resolve this issue. Do you want to proceed?'
+                was accepted. Please check the output thoroughly.
                 '''
                 print(message)
             except:
@@ -1622,16 +1637,16 @@ class Membrane(MembraneProtein):
             self.clear_ion()
             self.add_ion('NaCl')
             self.driver.find_element(By.XPATH, "//*[starts-with(@onclick, 'update_nion')]").click()
-            self.nxt()
+            self.nxt(prev_step="Component Building Options", screen=screenshot, jobid=jobid)
             self.wait_text('Building Ion and Waterbox')
-            self.nxt()
+            self.nxt(prev_step="Building Ion and Waterbox", screen=screenshot, jobid=jobid)
             self.wait_text('Assemble Generated Components')
-            self.nxt()
+            self.nxt(prev_step="Assemble Generated Components", screen=screenshot, jobid=jobid)
             self.wait_text("Force Field Options")
             self.force_field(ff, amber_options)
             self.engine(engine)
             self.temperature(temp)
-            self.nxt()
+            self.nxt(prev_step="Force Field Options", screen=screenshot, jobid=jobid)
             self.wait_text("Equilibration Input Notes")
             if download_now:
                 print(f'Ready to download from retrieve job id {jobid}')
