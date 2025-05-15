@@ -1,0 +1,39 @@
+system_type:
+  system_type: MP
+system_info:
+  headless: false
+  path_out: ## INSERT YOUR OUTPUT PATH HERE ##
+details:
+  pH: 7.4
+  model: 3 # Add the three Hetero chains
+  hets:
+  -
+    het: LDP
+    source: sdf
+    lig_filename: 8y2d_B_LDP
+    ph_ligand: true
+  chains:
+  - - PROA
+    - first
+    - ACE
+  - - PROA
+    - last
+    - CT3
+  email: ## INSERT YOUR EMAIL FOR CHARMM-GUI HERE ##
+  engine: gmx
+  ff: c36m
+  file_name: 8y2d.pdb
+  ions: NaCl
+  lipids:
+  -
+    lipid: chl1
+    upper: 1
+    lower: 1
+  -
+    lipid: popc
+    upper: 10
+    lower: 10
+  password: ## INSERT YOUR PASSWORD FOR CHARMM-GUI HERE ##
+  path: ## INSERT THE PATH TO 8y2d.PDB HERE ##
+  size: 100
+  temp: 310
