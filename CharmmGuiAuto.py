@@ -187,7 +187,7 @@ class CharmmGuiAuto:
         else:
             self.driver.find_element(By.ID, 'hbuild_checked').click()
 
-    def read_het(self, het='UNK', source='sdf', gen_with='cgenff', lig_filename='UNK', ph_ligand=True, path=None):
+    def read_het(self, het='UNK', source='sdf', gen_with='cgenff', lig_filename='UNK', ph_ligand=True, path=None, pH=None):
         """
         Selects parameters for non-protein chains/molecules.
 
@@ -227,10 +227,15 @@ class CharmmGuiAuto:
             file_location = os.path.join(path, lig_filename+'.'+source)
             choose_file.send_keys(file_location)
             # self.driver.find_element(By.XPATH, f"//input[@id='ph_ligand]").click()
+        if ph_ligand and not pH:
+            print(f'If system pH is not set then ph_ligand will be equal to False!!! ({het})')
         element = self.driver.find_element(By.XPATH, f"//input[@id='ph_ligand' and @name='ph_ligand[{het}]']")
         sel = element.is_selected()
+        #print(het, sel, ph_ligand)
         if sel is not ph_ligand:
+            #print('in if')
             element.click()
+            #self.driver.find_element(By.XPATH, f"//input[@id='ph_ligand' and @name='ph_ligand[{het}]']").click()    
 
 
 
@@ -709,14 +714,14 @@ class CharmmGuiAuto:
         self.model_select(model)
         self.nxt()
         self.wait_text("PDB Manipulation Options")
+        self.system_pH(pH)
         if chains is not None:
             for chain in chains:
                 self.patch(chain[0], chain[1], chain[2])
         if hets is not None:
             for het in hets:
-                self.read_het(**het, path=path)
+                self.read_het(**het, path=path, pH=pH)
                 #self.read_het(het, source, gen_with, lig_filename, ph_ligand, path)
-        self.system_pH(pH)
         self.preserve(**preserve)
         if mutations is not None:
             for mutation in mutations:
