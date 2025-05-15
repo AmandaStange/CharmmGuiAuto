@@ -75,8 +75,6 @@ class CharmmGuiAuto:
         """
         Presses the 'Next' button on the current page.
         """
-        
-
         if screen:
             self.take_full_page_screenshot(file_path=f"{prev_step.replace(' ', '_')}.png", jobid=jobid)
 
