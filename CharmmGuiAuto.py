@@ -235,7 +235,7 @@ class CharmmGuiAuto:
         if sel is not ph_ligand:
             #print('in if')
             element.click()
-            #self.driver.find_element(By.XPATH, f"//input[@id='ph_ligand' and @name='ph_ligand[{het}]']").click()    
+            #self.driver.find_element(By.XPATH, f"//input[@id='ph_ligand' and @name='ph_ligand[{het}]']").click()
 
 
 
@@ -616,7 +616,7 @@ class CharmmGuiAuto:
         """
         Select(self.driver.find_element(By.NAME, 'fftype')).select_by_value(ff)
         if ff == 'amber':
-            amber_options_default = {'Protein': 'FF19SB','DNA': 'OL15','RNA': 'OL3','Glycan': 'GLYCAM_06j', 'Lipid': 'Lipid21','Water': 'TIP3P','Ligand': 'GAFF2'}
+            amber_options_default = {'Protein': 'FF19SB','DNA': 'OL15','RNA': 'OL3','Glycan': 'GLYCAM_06j', 'Lipid': 'Lipid21','Water': 'OPC','Ligand': 'GAFF2'}
             if amber_options is not None:
                  for key, value in amber_options.items():
                     amber_options_default[key.capitalize()] = value
