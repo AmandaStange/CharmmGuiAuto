@@ -4,10 +4,6 @@ system_info:
   headless: false
   path_out: ## INSERT YOUR OUTPUT PATH HERE ##
 details:
-  area:
-    option: null
-  boxtype:
-    option: null
   mutations:
     -                 
       chain: PROA
@@ -31,8 +27,6 @@ details:
       res_i: TYR
       rid: '14'
       res_p: TP1
-
-
   chains:
   - - PROB
     - first
@@ -69,8 +63,6 @@ details:
     lower: 1 
     upper: 1
   ions: NaCl
-  lengthZ:
-    option: null
   lipids:
   -
     lipid: chl1
@@ -98,9 +90,5 @@ details:
     units: 5
     lower: 1
     upper: 1
-  position:
-    option: null
-  projection:
-    option: null
   size: 100
   temp: 310
