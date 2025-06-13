@@ -730,6 +730,12 @@ class CharmmGuiAuto:
             for protonation in protonations:
                 self.add_protonation(**protonation)
         if disulfides is not None:
+            ### Removes disulfides automatically added by CharmmGUI
+            if self.driver.find_element(By.ID, 'id_dif').is_displayed():
+                ### Creates the disulfides display as a variable so that the remove elements are only looked for within it (to avoid removing protonations, mutations, etc.)
+                disulfides_display = self.driver.find_element(By.ID, 'id_dif')
+                while disulfides_display.find_elements(By.XPATH, './/input[@value="-"]'): ### Returns empty list if no more disulfide bonds
+                    disulfides_display.find_element(By.XPATH, './/input[@value="-"]').click() ### Clicks remove button for first disulfide bond
             for disulfide in disulfides:
                 self.add_disulfide(**disulfide)
         if phosphorylations is not None:
