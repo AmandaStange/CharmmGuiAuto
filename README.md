@@ -11,6 +11,7 @@ CharmmGuiAuto is a tool designed to automate interactions with CHARMM-GUI, a web
 - [Example Input Files](#example-input-files)
 - [Known Issues](#known-issues)
 - [How to Contribute](#how-to-contribute)
+- [Citation](#citation)
 - [License](#license)
 
 ## Introduction
@@ -72,6 +73,14 @@ If you would like to contribute:
 For detailed contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 If you plan to contribute **a new feature** or **significant changes**, please open an issue first to discuss your idea.
+
+## Citation
+
+If you use CharmmGuiAuto in your research, please cite the following article:
+
+Stange, A.D., Zuzic, L., Schiøtt, B., & Berglund, N.A. (2025). Exploring insulin-receptor dynamics: Stability and binding mechanisms. *Structure*, 33(8), 1–11. https://doi.org/10.1016/j.str.2025.04.022
+
+BibTeX entry is provided in [citation.bib](citation.bib).
 
 ## License
 
