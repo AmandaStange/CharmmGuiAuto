@@ -1,4 +1,3 @@
-
 # CharmmGuiAuto
 
 CharmmGuiAuto is a tool designed to automate interactions with CHARMM-GUI, a web-based graphical user interface for CHARMM (Chemistry at HARvard Macromolecular Mechanics), a widely used software for molecular simulations. This tool simplifies the process of preparing input files for molecular dynamics simulations.
@@ -10,7 +9,8 @@ CharmmGuiAuto is a tool designed to automate interactions with CHARMM-GUI, a web
 - [Installation](#installation)
 - [Usage](#usage)
 - [Example Input Files](#example-input-files)
-- [Know Issues](#known-issues)
+- [Known Issues](#known-issues)
+- [How to Contribute](#how-to-contribute)
 - [License](#license)
 
 ## Introduction
@@ -50,13 +50,28 @@ python CharmmGuiAuto.py -i Example_input_yaml/MembraneProtein.yaml
 
 The `Example_input_yaml` directory contains sample YAML files that demonstrate how to configure various simulations, and gives an overview of the different parameters that can be changed. You can customize these files to fit your specific needs.
 
-
 ## Known Issues
-- Only works with firefox
-- Can not be used to continue retrieved jobs, but can download jobs that are finished, but not downloaded, if you   have the jobid.
 
-Firefox binary (firefox_binary.cpython-37.pyc - possible original path 'miniconda3/lib/python3.7/site-packages/     selenium/webdriver/firefox/__pycache__/firefox_binary.cpython-37.pyc') must be placed in the bin of your            environment.
+- Only works with Firefox.
+- Cannot be used to continue retrieved jobs, but can download jobs that are finished but not yet downloaded if you have the job ID.
+- Firefox binary (`firefox_binary.cpython-37.pyc` - possible original path `miniconda3/lib/python3.7/site-packages/selenium/webdriver/firefox/__pycache__/firefox_binary.cpython-37.pyc`) must be placed in the `bin` of your environment.
 
+## How to Contribute
+
+Contributions are welcome! 
+
+If you would like to contribute:
+
+1. **Fork** this repository.
+2. **Clone** your fork locally.
+3. **Create a branch** for your changes.
+4. **Make your changes**, following PEP 8 style guidelines.
+5. **Commit and push** your changes.
+6. **Open a pull request**.
+
+For detailed contribution guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+If you plan to contribute **a new feature** or **significant changes**, please open an issue first to discuss your idea.
 
 ## License
 
