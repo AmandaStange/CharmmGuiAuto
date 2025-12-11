@@ -1706,13 +1706,36 @@ def create_arg_parser():
                     help='Script to automate CharmmGui process.')
     parser.add_argument('-i', '--input', help='Input yaml name', default='input.yaml')
 
+    # Allows one to set the email from the program call to avoid having to write it to any files
+    parser.add_argument('-e', '--email', help='Email to use when logging in to charmm-gui', default=False)
+    
+    # Allows one to set the password from the program call to avoid having to write it to any files
+    parser.add_argument('-pw', '--password', help='Password to use when logging in to charmm-gui', default=False)
+
     return parser
 
 if __name__ == "__main__":
     parser = create_arg_parser()
     args = parser.parse_args()
     input_file = args.input
+    input_email = args.email
+    input_password = args.password
     with open(input_file, 'r') as stream:
         parsed_yaml = yaml.safe_load(stream)
-        print(parsed_yaml)
+    
+    # Overwrites email from yaml file if given using the terminal
+    if input_email:
+        parsed_yaml["details"]["email"] = input_email
+
+    # Overwrites password from yaml file if given using the terminal
+    if input_password:
+        parsed_yaml["details"]["password"] = input_password
+    
+    # Prints a safer version of the yaml settings with the password changed to "******"
+    parsed_yaml_safe = copy.deepcopy(parsed_yaml)
+    if "details" in parsed_yaml_safe:
+        if "password" in parsed_yaml_safe["details"]:
+            parsed_yaml_safe["details"]["password"] = "******"
+    print(parsed_yaml_safe)
+    
     main(**parsed_yaml['system_type'])
