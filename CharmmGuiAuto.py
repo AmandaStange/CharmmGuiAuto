@@ -275,7 +275,11 @@ class CharmmGuiAuto:
             pH (float): The desired pH value (optional).
         """
         if pH is None:
-            self.driver.find_element(By.ID, 'ph_checked').click()
+            ### One of my systems crash for seemingly no good reason when running "self.driver.find_element(By.ID, 'ph_checked').click()". Added try-except to fix the crash.
+            try:
+                self.driver.find_element(By.ID, 'ph_checked').click()
+            except:
+                print("Failed to find the 'ph' button")
         else:
             t = self.driver.find_element(By.ID, 'system_pH')
             t.clear()
@@ -324,7 +328,7 @@ class CharmmGuiAuto:
                     self.driver.find_element(By.XPATH, '//*[@id="id_dif_table"]/tr[2]/td[6]/input').click()
             self.driver.find_element(By.XPATH, '//input[@value="Add Bonds"]').click()
             resids = [i.get_attribute('id') for i in self.driver.find_elements(By.XPATH, '//select[starts-with(@id,"ssbond_chain1_")]') if i.is_displayed()]
-            resid = resids[-1][-1]
+            resid = resids[-1].split("_")[-1]
             Select(self.driver.find_element(By.ID, f'ssbond_chain1_{resid}')).select_by_value(chain1)
             Select(self.driver.find_element(By.ID, f'ssbond_resid1_{resid}')).select_by_value(rid1)
             Select(self.driver.find_element(By.ID, f'ssbond_chain2_{resid}')).select_by_value(chain2)
