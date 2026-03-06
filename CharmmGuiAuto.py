@@ -410,7 +410,7 @@ class CharmmGuiAuto:
         Select(self.driver.find_element(By.ID, f'chem_site_{resid}')).select_by_value(mod[0])
         Select(self.driver.find_element(By.ID, f'chem_patch_{resid}')).select_by_value(mod[1:])
 
-    def GRS_reader(self, GRS=None, skip=1):
+    def GRS_reader(self, GRS=None, molecule_type=None, chain=None, residue=None, resid=None, skip=1):
         """
         Reads GRS input for glycans.
 
@@ -421,49 +421,72 @@ class CharmmGuiAuto:
         if GRS is None:
             pass
         else:
-            lipids_dict = {'CER': 'CER', 'PIC': 'PICER', 'DAG': 'DAG', 'PID': 'PIDAG', 'ACYL':'ACYL'}
-            sugars_dict = {}
-            branch_length = [(1,1)]
-            # Making the sugar dictionary
-            for i in GRS.split('\n'):
-                sug = i.split(' ')
-                if len(sug) > 2:
-                    if '_' in sug[-1]:
-                        sug = sug[:-1] + sug[-1].split('_')
-                    else:
-                        sug += [None]
-                    sugars_dict[int(sug[0])] = {'sname': sug[-2][1:], 'sugar_id': int(sug[0])-1, 'ltype': sug[-2][0], 'mod': sug[-1]}
-                    if sugars_dict[int(sug[0])]['sugar_id'] != 1:
-                        sugars_dict[int(sug[0])]['link'] =  sug[-3][1]
-                        if len(sug) > 1:
-                            for j in branch_length[::-1]:
-                                if len(sug)-3 > j[1]:
-                                    branch_length.append((int(sug[0])-1, len(sug)-3))
-                                    sugars_dict[int(sug[0])]['branch'] = j[0]
-                                    break
-                if len(sug) == 2:
-                    if sug[-1][:3] != 'PRO':
-                        sugars_dict[int(sug[0])] = {'lipid_type': lipids_dict[sug[-1].replace('-','')[:3]],'lipid_tail': sug[-1]}
-                    else:
-                        sugars_dict[int(sug[0])] = {'chain': sug[-1][:4], 'residue': sug[-1][-4:-1], 'resid': sug[-1][-1]}
+            if molecule_type == "protein" and chain != None and residue != None and resid != None:
+                
+                wait = WebDriverWait(self.driver, 10)
 
-            # Adding the sugars
-            for i in range(skip, 1 + len(sugars_dict)):
-                if i == 1:
-                    if sugars_dict[i].get('lipid_type') is not None:
-                        Select(self.driver.find_element(By.ID, 'lipid_types')).select_by_value(sugars_dict[i]['lipid_type'])
-                        Select(self.driver.find_element(By.ID, 'seq_name_0')).select_by_value(sugars_dict[i]['lipid_tail'])
+                ### 1. Click the "Upload GRS" button
+                upload_btn = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@value='Upload GRS']")))
+                upload_btn.click()
+
+                ### 2. Insert GRS text into the text area
+                textarea = wait.until(EC.visibility_of_element_located((By.ID, "upload_GRS")))
+                textarea.clear()
+                textarea.send_keys(GRS)
+
+                ### 3. Click the "Apply" button
+                apply_btn = wait.until(EC.element_to_be_clickable((By.ID, "apply_GRS")))
+                apply_btn.click()
+                                    
+                ### Uploading the GRS sequence resets the chain, residue and resid values, so they need to be processed after the GRS sequence.
+                Select(self.driver.find_element(By.ID, 'seq_name_0')).select_by_value(chain)
+                Select(self.driver.find_element(By.ID, 'seq_name2_0')).select_by_value(residue)
+                Select(self.driver.find_element(By.ID, 'seq_name3_0')).select_by_value(resid)
+
+            else:
+                lipids_dict = {'CER': 'CER', 'PIC': 'PICER', 'DAG': 'DAG', 'PID': 'PIDAG', 'ACYL':'ACYL'}
+                sugars_dict = {}
+                branch_length = [(1,1)]
+                # Making the sugar dictionary
+                for i in GRS.split('\n'):
+                    sug = i.split(' ')
+                    if len(sug) > 2:
+                        if '_' in sug[-1]:
+                            sug = sug[:-1] + sug[-1].split('_')
+                        else:
+                            sug += [None]
+                        sugars_dict[int(sug[0])] = {'sname': sug[-2][1:], 'sugar_id': int(sug[0])-1, 'ltype': sug[-2][0], 'mod': sug[-1]}
+                        if sugars_dict[int(sug[0])]['sugar_id'] != 1:
+                            sugars_dict[int(sug[0])]['link'] =  sug[-3][1]
+                            if len(sug) > 1:
+                                for j in branch_length[::-1]:
+                                    if len(sug)-3 > j[1]:
+                                        branch_length.append((int(sug[0])-1, len(sug)-3))
+                                        sugars_dict[int(sug[0])]['branch'] = j[0]
+                                        break
+                    if len(sug) == 2:
+                        if sug[-1][:3] != 'PRO':
+                            sugars_dict[int(sug[0])] = {'lipid_type': lipids_dict[sug[-1].replace('-','')[:3]],'lipid_tail': sug[-1]}
+                        else:
+                            sugars_dict[int(sug[0])] = {'chain': sug[-1][:4], 'residue': sug[-1][-4:-1], 'resid': sug[-1][-1]}
+
+                # Adding the sugars
+                for i in range(skip, 1 + len(sugars_dict)):
+                    if i == 1:
+                        if sugars_dict[i].get('lipid_type') is not None:
+                            Select(self.driver.find_element(By.ID, 'lipid_types')).select_by_value(sugars_dict[i]['lipid_type'])
+                            Select(self.driver.find_element(By.ID, 'seq_name_0')).select_by_value(sugars_dict[i]['lipid_tail'])
+                        else:
+                            Select(self.driver.find_element(By.ID, 'seq_name_0')).select_by_value(sugars_dict[i]['chain'])
+                            Select(self.driver.find_element(By.ID, 'seq_name2_0')).select_by_value(sugars_dict[i]['residue'])
+                            Select(self.driver.find_element(By.ID, 'seq_name3_0')).select_by_value(sugars_dict[i]['resid'])
+                    elif i == 2:
+                        self.sugar_options(sugar_id=sugars_dict[i]['sugar_id'], link=sugars_dict[i].get('link', None), ltype=sugars_dict[i]['ltype'], sname=sugars_dict[i]['sname'])
+                        self.add_modification(sname=sugars_dict[i]['sname'], sugar_id=sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
                     else:
-                        Select(self.driver.find_element(By.ID, 'seq_name_0')).select_by_value(sugars_dict[i]['chain'])
-                        Select(self.driver.find_element(By.ID, 'seq_name2_0')).select_by_value(sugars_dict[i]['residue'])
-                        Select(self.driver.find_element(By.ID, 'seq_name3_0')).select_by_value(sugars_dict[i]['resid'])
-                elif i == 2:
-                    self.sugar_options(sugar_id=sugars_dict[i]['sugar_id'], link=sugars_dict[i].get('link', None), ltype=sugars_dict[i]['ltype'], sname=sugars_dict[i]['sname'])
-                    self.add_modification(sname=sugars_dict[i]['sname'], sugar_id=sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
-                else:
-                    self.add_sugar(sugars_dict[i]['branch'])
-                    self.sugar_options(sugar_id=sugars_dict[i]['sugar_id'], link=sugars_dict[i].get('link', None), ltype=sugars_dict[i]['ltype'], sname=sugars_dict[i]['sname'])
-                    self.add_modification(sname=sugars_dict[i]['sname'], sugar_id=sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
+                        self.add_sugar(sugars_dict[i]['branch'])
+                        self.sugar_options(sugar_id=sugars_dict[i]['sugar_id'], link=sugars_dict[i].get('link', None), ltype=sugars_dict[i]['ltype'], sname=sugars_dict[i]['sname'])
+                        self.add_modification(sname=sugars_dict[i]['sname'], sugar_id=sugars_dict[i]['sugar_id'], mod=sugars_dict[i]['mod'])
 
     def add_gpi(self, GRS=None, chain=None, skip=6):
         """
@@ -488,7 +511,7 @@ class CharmmGuiAuto:
             self.nxt()
             self.driver.switch_to.window(main_window)
 
-    def add_glycan(self, GRS, skip=1):
+    def add_glycan(self, GRS, molecule_type, chain, residue, resid, skip=1):
         """
         Adds glycans.
 
@@ -509,7 +532,7 @@ class CharmmGuiAuto:
             popup = self.driver.window_handles[-1]
             self.driver.switch_to.window(popup)
             time.sleep(2)
-            self.GRS_reader(GRS, skip=skip)
+            self.GRS_reader(GRS, molecule_type, chain, residue, resid, skip=skip)
             self.nxt()
             self.driver.switch_to.window(main_window)
 
