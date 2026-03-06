@@ -29,6 +29,16 @@ details:
       res_i: TYR
       rid: '14'
       res_p: TP1
+  glycans:
+    - # Add "beta-D-mannopyranose-(1-4)-beta-N-acetyl-D-glucosamine-(1-4)-beta-N-acetyl-D-glucosamine"-Asn18 (BMA-NAG-NAG-Asn18) glycosylation
+      molecule_type: protein
+      chain: PROA
+      residue: ASN
+      resid: '18'
+      GRS: | # The "|" creates a YAML literal block for precise line-separated yaml-to-Python string conversion.
+        1 BGLCNA
+        2 - 14B: BGLCNA
+        3 - - 14B: BMAN
   chains:
   - - PROB # Add an ACE terminal patch on the N-terminal of chain PROB
     - first
