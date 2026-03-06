@@ -511,7 +511,7 @@ class CharmmGuiAuto:
             self.nxt()
             self.driver.switch_to.window(main_window)
 
-    def add_glycan(self, GRS, molecule_type, chain, residue, resid, skip=1):
+    def add_glycan(self, GRS=None, molecule_type=None, chain=None, residue=None, resid=None, skip=1):
         """
         Adds glycans.
 
