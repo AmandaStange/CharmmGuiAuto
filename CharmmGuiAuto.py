@@ -35,7 +35,6 @@ class CharmmGuiAuto:
         print(headless)
 
         self.screenshot_nr = 0
-        self.donation_popup_closed = False
 
         options = webdriver.FirefoxOptions();
 
@@ -92,16 +91,14 @@ class CharmmGuiAuto:
 
         Will continue if the popup has not appeared after 2 seconds.
         """
-        if not self.donation_popup_closed:
-            try:
-                close_btn = WebDriverWait(self.driver, 2).until(
-                    EC.element_to_be_clickable((By.ID, "cguiGiveClose"))
-                )
-                close_btn.click()
-                self.donation_popup_closed = True
-            except TimeoutException:
-                ### Popup did not appear — this is expected sometimes.
-                pass
+        try:
+            close_btn = WebDriverWait(self.driver, 2).until(
+                EC.element_to_be_clickable((By.ID, "cguiGiveClose"))
+            )
+            close_btn.click()
+        except TimeoutException:
+            ### Popup did not appear — this is expected sometimes.
+            pass
 
     def login(self, email, password):
         """
