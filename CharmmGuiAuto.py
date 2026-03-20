@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 import time
 import os
 import copy
@@ -32,6 +33,8 @@ class CharmmGuiAuto:
         global out_tmp
 
         print(headless)
+
+        self.screenshot_nr = 0
 
         options = webdriver.FirefoxOptions();
 
@@ -69,7 +72,8 @@ class CharmmGuiAuto:
             self.driver.set_window_size(1920, scroll_height+75)  # Set width and height for full-page capture
 
             # Take and save the screenshot
-            self.driver.save_screenshot(f'{self.path_out}/Screenshots/' + jobid.split()[2] + '_' + file_path)
+            self.driver.save_screenshot(f'{self.path_out}/Screenshots/' + jobid.split()[2] + "_" + str(self.screenshot_nr) + '_' + file_path)
+            self.screenshot_nr += 1
             print(file_path)
 
     def nxt(self, prev_step=None, screen=False, jobid=None):
@@ -81,6 +85,21 @@ class CharmmGuiAuto:
 
         self.driver.find_element(By.ID, 'nextBtn').click()
 
+    def close_donation_popup(self):
+        """
+        Tries to close the "Support for CHARMM-GUI Infrastructure Upgrades" popup.
+
+        Will continue if the popup has not appeared after 2 seconds.
+        """
+        try:
+            close_btn = WebDriverWait(self.driver, 2).until(
+                EC.element_to_be_clickable((By.ID, "cguiGiveClose"))
+            )
+            close_btn.click()
+        except TimeoutException:
+            ### Popup did not appear — this is expected sometimes.
+            pass
+
     def login(self, email, password):
         """
         Logs into CHARMM-GUI using provided email and password.
@@ -89,6 +108,9 @@ class CharmmGuiAuto:
             email (str): User's email address.
             password (str): User's password.
         """
+
+        self.close_donation_popup()
+
         self.driver.find_element(By.NAME, 'email').send_keys(email)
         self.driver.find_element(By.NAME, 'password').send_keys(password)
         self.driver.find_element(By.CLASS_NAME, 'loginbox').submit()
